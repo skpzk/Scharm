@@ -85,7 +85,7 @@ QWidget *Window::createBottomControls(){
     QHBoxLayout *layout = new QHBoxLayout;
 
     layout->addWidget(createGeneralSection(this));
-    // layout->addWidget(createFilterSection());
+    layout->addWidget(createFilterSection(this));
 
     widget->setLayout(layout);
     layout->setContentsMargins(0, 0, 0, 0);

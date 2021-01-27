@@ -9,6 +9,7 @@
 
 #include "section.h"
 #include "../widgets/sectionLabel.h"
+#include "../widgets/knob.h"
 #include "../window.h"
 
 using namespace::std;

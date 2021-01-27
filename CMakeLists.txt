@@ -11,6 +11,7 @@ set(SOURCES
     scharm.cpp              scharm.h
     gui/window.cpp          gui/window.h 
     gui/utils.cpp           gui/utils.h
+    gui/defs.cpp            gui/defs.h
     gui/sections/section.cpp     gui/sections/section.h
     gui/sections/filter.cpp     gui/sections/filter.h
     gui/sections/general.cpp    gui/sections/general.h

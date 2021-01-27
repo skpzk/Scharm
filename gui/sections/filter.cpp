@@ -1,8 +1,35 @@
 #include "filter.h"
+#include "../defs.h"
 
-QGroupBox *createFilterSection(){
+
+QWidget *createFilterSection(Window* parent){
     cout << "creating filter section\n";
-    QGroupBox *box = new QGroupBox;
+	Section *section = new Section(parent, "Filter");
+	string titles[] = {"Reso", "EG Amount", "A", "D"};
 
-    return box;
+	QHBoxLayout *hbox = new QHBoxLayout;
+
+	for(int i=0; i < 4; i++){
+		// knob = Knob.Knob(3, titles[i])
+		// QDial *knob = new QDial;
+		Knob *knob = new Knob;
+		knob->setText(titles[i]);
+		knob->setStyleSheet(
+			defaultKnobStyleSheet(filter));
+
+		// knob.setStyleSheet(knobDefaultStyleSheet('general'))
+		// knob.checkState()
+		// if titles[i] == "Tempo":
+		// State.params.setCallback("activetempo", knob.sequencerCallback)
+
+		hbox->addWidget(knob);
+	}
+
+	hbox->setContentsMargins(0, 0, 0, 0);
+	hbox->setSpacing(0);
+
+	section->vbox->addLayout(hbox);
+
+    return section;
+    // return box;
 }

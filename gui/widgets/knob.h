@@ -2,6 +2,12 @@
 #define KNOB_H
 
 #include <QDial>
+#include <QColor>
+#include <QPointF>
+#include <string>
+#include <iostream>
+
+using namespace::std;
 
 class Knob : public QDial
 {
@@ -12,6 +18,7 @@ class Knob : public QDial
 
     // Q_PROPERTY(double knobMargin READ getKnobMargin WRITE setKnobMargin)
     // Q_PROPERTY(double fixedSize READ getFixedSize WRITE setFixedSize)
+    Q_PROPERTY(QColor ringColor READ getRingColor WRITE setRingColor)
 
 public:
 
@@ -29,8 +36,16 @@ public:
     // void setFixedSize(double size);
     // double getFixedSize() const;
 
+    void setRingColor(QColor);
+    QColor getRingColor() const;
+
     // void setText(const QString& text); 
     // QString getText() const;
+
+    void setText(string);
+
+    int sizeType;
+    float fontsize1;
 
 
 private:
@@ -42,12 +57,18 @@ private:
     double knobMargin_;
 
     double size_;
-    bool hasFixedSize_ = false;
+    double radius;
+    
+    QPointF center;
 
     QString text_;
+
+    QColor ringColor;
+
+    bool coloredTitle = false;
     
 protected:
-    void mousePressEvent(QMouseEvent *ev) override;
+    // void mousePressEvent(QMouseEvent *ev) override;
 
 };
 

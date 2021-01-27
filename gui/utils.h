@@ -9,4 +9,6 @@ void widgetConf(QWidget *);
 void layoutConf(QHBoxLayout *);
 void layoutConf(QVBoxLayout *);
 
+float rad2deg(float);
+
 #endif // UTILS_H
