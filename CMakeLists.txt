@@ -12,12 +12,15 @@ set(SOURCES
     gui/window.cpp          gui/window.h 
     gui/utils.cpp           gui/utils.h
     gui/defs.cpp            gui/defs.h
-    gui/sections/section.cpp     gui/sections/section.h
+    gui/sections/section.cpp    gui/sections/section.h
     gui/sections/filter.cpp     gui/sections/filter.h
     gui/sections/general.cpp    gui/sections/general.h
+    gui/sections/env.cpp        gui/sections/env.h
+    gui/sections/transport.cpp  gui/sections/transport.h
 
     gui/widgets/sectionLabel.cpp    gui/widgets/sectionLabel.h
-    gui/widgets/knob.cpp    gui/widgets/knob.h
+    gui/widgets/knob.cpp            gui/widgets/knob.h
+    gui/widgets/button.cpp          gui/widgets/button.h
 )
 
 

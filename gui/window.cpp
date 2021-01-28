@@ -5,6 +5,9 @@
 
 #include "sections/filter.h"
 #include "sections/general.h"
+#include "sections/env.h"
+#include "sections/transport.h"
+#include "defs.h"
 
 
 Window::Window(QWidget *parent) :
@@ -22,6 +25,8 @@ QMainWindow(parent)
     QWidget *centralWidget = new QWidget;
     this->setCentralWidget(centralWidget);
     centralWidget->setLayout(layout);
+
+    setStyleSheet(mainWindowStyleSheet());
 
     this->setWindowTitle("Scharm");
     // path = join("gui", "images", "icon.svg")
@@ -69,9 +74,13 @@ QWidget *Window::createTopControls(){
     QHBoxLayout *layout = new QHBoxLayout;
 
 
+    layout->addWidget(this->createSequencerControls());
+    layout->addStretch(1);
+    // layout->addWidget(createVcoSection());
 
-    layout->setStretch(0, 5);
-    layout->setStretch(1, 1);
+    layout->setStretch(0, 8);
+    // layout->setStretch(1, 1);
+    layout->setStretch(2, 8);
 
     widget->setLayout(layout);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -90,6 +99,36 @@ QWidget *Window::createBottomControls(){
     widget->setLayout(layout);
     layout->setContentsMargins(0, 0, 0, 0);
     widget->setContentsMargins(0, 0, 0, 0);
+
+    return widget;
+}
+
+QWidget *Window::createSequencerControls(){
+    QWidget *widget = new QWidget;
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    // layout->addWidget(createSequencerSections(this));
+    // layout->addWidget(createSequencerSections(this));
+    // layout->addWidget(createRhythmSection(this));
+
+    QHBoxLayout *hbox = new QHBoxLayout;
+
+    hbox->setContentsMargins(0, 0, 0, 0);
+    hbox->addWidget(createTransportSection(this));
+    hbox->addWidget(createEnvSection(this));
+    hbox->setStretch(0, 1);
+    hbox->setStretch(1, 1);
+
+    layout->addLayout(hbox);
+
+    layout->setContentsMargins(0, 0, 0, 0);
+    widget->setContentsMargins(0, 0, 0, 0);
+    layout->setStretch(0, 2);
+    layout->setStretch(1, 2);
+    layout->setStretch(2, 4);
+    layout->setStretch(3, 2);
+
+    widget->setLayout(layout);
 
     return widget;
 }

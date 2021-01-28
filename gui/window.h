@@ -23,6 +23,7 @@ class Window : public QMainWindow
         QWidget *createMainSection();
         QWidget *createTopControls();
         QWidget *createBottomControls();
+        QWidget *createSequencerControls();
         bool eventFilter(QObject*, QEvent*);
         // int NbDials;
 

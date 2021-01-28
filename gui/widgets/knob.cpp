@@ -76,6 +76,7 @@ void Knob::paintEvent(QPaintEvent*){
     QPen pen = QPen(QColor(this->ringColor), 1);
     pen.setCapStyle(Qt::SquareCap);
     painter.setPen(pen);
+    painter.setBrush(QColor("transparent"));
 
     // uncomment the following line to draw outer rect
     painter.drawRect(0, 0, QDial::width(), QDial::height());
@@ -159,7 +160,7 @@ void Knob::paintEvent(QPaintEvent*){
 
     double ratio = (value - QDial::minimum()) / (QDial::maximum() - QDial::minimum());
 
-    cout << "Ratio = " << ratio << endl;
+    // cout << "Ratio = " << ratio << endl;
 
     // The maximum amount of degrees is 270, offset by 225
     double angle = ratio * extent - offset;
@@ -193,6 +194,7 @@ void Knob::paintEvent(QPaintEvent*){
     QFont f = painter.font();
     f.setPointSizeF(fontsize1);
     painter.setFont(f);
+    // painter.setBrush(QColor("transparent"));
     // painter.drawRect(textRect_)
     painter.drawText(textRect_, Qt::AlignHCenter | Qt::AlignTop, text_);
     // painter.drawText(textRect_, Qt.AlignHCenter | Qt.AlignTop, str(fontsize1))
