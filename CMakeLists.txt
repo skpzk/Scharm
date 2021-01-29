@@ -9,18 +9,25 @@ enable_testing()
 
 set(SOURCES
     scharm.cpp              scharm.h
+
     gui/window.cpp          gui/window.h 
     gui/utils.cpp           gui/utils.h
     gui/defs.cpp            gui/defs.h
+
     gui/sections/section.cpp    gui/sections/section.h
     gui/sections/filter.cpp     gui/sections/filter.h
     gui/sections/general.cpp    gui/sections/general.h
     gui/sections/env.cpp        gui/sections/env.h
     gui/sections/transport.cpp  gui/sections/transport.h
+    gui/sections/sequencer.cpp  gui/sections/sequencer.h
+    gui/sections/rhythm.cpp     gui/sections/rhythm.h
+    gui/sections/vcos.cpp       gui/sections/vcos.h
 
     gui/widgets/sectionLabel.cpp    gui/widgets/sectionLabel.h
     gui/widgets/knob.cpp            gui/widgets/knob.h
     gui/widgets/button.cpp          gui/widgets/button.h
+    gui/widgets/waveSlider.cpp      gui/widgets/waveSlider.h
+    gui/widgets/radio.cpp           gui/widgets/radio.h
 )
 
 

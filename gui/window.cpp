@@ -7,6 +7,9 @@
 #include "sections/general.h"
 #include "sections/env.h"
 #include "sections/transport.h"
+#include "sections/sequencer.h"
+#include "sections/rhythm.h"
+#include "sections/vcos.h"
 #include "defs.h"
 
 
@@ -76,7 +79,7 @@ QWidget *Window::createTopControls(){
 
     layout->addWidget(this->createSequencerControls());
     layout->addStretch(1);
-    // layout->addWidget(createVcoSection());
+    layout->addWidget(createVcoSection(this));
 
     layout->setStretch(0, 8);
     // layout->setStretch(1, 1);
@@ -107,9 +110,9 @@ QWidget *Window::createSequencerControls(){
     QWidget *widget = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout;
 
-    // layout->addWidget(createSequencerSections(this));
-    // layout->addWidget(createSequencerSections(this));
-    // layout->addWidget(createRhythmSection(this));
+    layout->addWidget(createSequencerSection(this, 1));
+    layout->addWidget(createSequencerSection(this, 2));
+    layout->addWidget(createRhythmSection(this));
 
     QHBoxLayout *hbox = new QHBoxLayout;
 

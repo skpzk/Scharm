@@ -4,7 +4,7 @@
 
 
 QWidget *createGeneralSection(Window* parent){
-    cout << "creating general section\n";
+    // cout << "creating general section\n";
 	Section *section = new Section(parent, "General");
 	string titles[] = {"Vol", "Tempo"};
 

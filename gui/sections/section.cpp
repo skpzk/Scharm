@@ -4,7 +4,7 @@
 Section::Section(QWidget *parent, const QString& text):
 QWidget(parent)
 {
-	cout << "creating section class\n";
+	// cout << "creating section class\n";
 	// QWidget *box = new QWidget;
 	// widgetConf(this);
 	QWidget::setContentsMargins(0, 0, 0, 0);

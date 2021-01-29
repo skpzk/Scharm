@@ -1,11 +1,12 @@
-#include "filter.h"
+#include "sequencer.h"
+
 #include "../defs.h"
+#include <string>
 
 
-QWidget *createFilterSection(Window* parent){
-    // cout << "creating filter section\n";
-	Section *section = new Section(parent, "Filter");
-	string titles[] = {"Reso", "EG Amount", "A", "D"};
+QWidget *createSequencerSection(Window* parent, int seqNumber){
+    // cout << "creating sequencer section\n";
+	Section *section = new Section(parent, QString::fromStdString("Sequencer" + to_string(seqNumber)));
 
 	QHBoxLayout *hbox = new QHBoxLayout;
 
@@ -13,9 +14,10 @@ QWidget *createFilterSection(Window* parent){
 		// knob = Knob.Knob(3, titles[i])
 		// QDial *knob = new QDial;
 		Knob *knob = new Knob;
-		knob->setText(titles[i]);
+		knob->setText("Step" + to_string(i+1));
 		knob->setStyleSheet(
-			defaultKnobStyleSheet(filter));
+			defaultKnobStyleSheet(seq));
+        knob->setMinimum(-127);
 
 		// knob.setStyleSheet(knobDefaultStyleSheet('general'))
 		// knob.checkState()

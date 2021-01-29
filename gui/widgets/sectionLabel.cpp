@@ -4,12 +4,21 @@
 SectionLabel::SectionLabel(QWidget* parent, const QString& text):
 QLabel(parent), text_(text)
 {
-    cout<< "test class sectionLabel\n";
+    // cout<< "test class sectionLabel\n";
     // QLabel::setText(text_);
     QLabel::setText(text);
     padding = .2;
     barsColor = QColor("black");
 }
+
+void SectionLabel::setBarsColor(QColor color){
+    barsColor = QColor(color);
+}
+
+QColor SectionLabel::getBarsColor() const{
+    return barsColor;
+}
+
 
 void SectionLabel::paintEvent(QPaintEvent*){
     QPainter p(this);

@@ -6,7 +6,7 @@
 
 
 QWidget *createTransportSection(Window* parent){
-    cout << "creating transport section\n";
+    // cout << "creating transport section\n";
 	Section *section = new Section(parent, "Transport");
 	string titles[][3] = {{"Reset", "EG", "Next"}, {"Play", "Trigger"}};
     int lenTitles[] = {3, 2};
@@ -44,6 +44,8 @@ QWidget *createTransportSection(Window* parent){
 
 	section->vbox->addLayout(hbox1);
 	section->vbox->addLayout(hbox2);
+	section->vbox->setStretch(1, 1);
+	section->vbox->setStretch(2, 1);
 
     return section;
     // return box;

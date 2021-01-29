@@ -4,7 +4,7 @@
 
 
 QWidget *createEnvSection(Window* parent){
-    cout << "creating env section\n";
+    // cout << "creating env section\n";
 	Section *section = new Section(parent, "Env");
 	string titles[] = {"A", "D"};
 

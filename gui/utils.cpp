@@ -20,3 +20,7 @@ void layoutConf(QVBoxLayout *layout){
 float rad2deg(float rad){
 	return rad * 180. / M_PI;
 }
+
+float deg2rad(float deg){
+	return deg * M_PI / 180.;
+}
