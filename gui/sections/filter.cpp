@@ -5,11 +5,11 @@
 QWidget *createFilterSection(Window* parent){
     // cout << "creating filter section\n";
 	Section *section = new Section(parent, "Filter");
-	string titles[] = {"Reso", "EG Amount", "A", "D"};
+	string titles[] = {"Cutoff", "Reso", "EG Amount", "A", "D"};
 
 	QHBoxLayout *hbox = new QHBoxLayout;
 
-	for(int i=0; i < 4; i++){
+	for(int i=0; i < 5; i++){
 		// knob = Knob.Knob(3, titles[i])
 		// QDial *knob = new QDial;
 		Knob *knob = new Knob;

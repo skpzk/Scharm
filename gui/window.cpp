@@ -103,6 +103,10 @@ QWidget *Window::createBottomControls(){
     layout->setContentsMargins(0, 0, 0, 0);
     widget->setContentsMargins(0, 0, 0, 0);
 
+    layout->setStretch(0, 2);
+    layout->setStretch(1, 5);
+
+
     return widget;
 }
 

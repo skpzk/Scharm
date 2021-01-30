@@ -17,11 +17,11 @@ using namespace::std;
 
 QWidget *createVcoSection(Window*);
 QHBoxLayout *firstLine();
-QHBoxLayout *secondLine();
+QHBoxLayout *secondLine(int*);
 QHBoxLayout *thirdLine();
 QHBoxLayout *fourthLine();
 QHBoxLayout *fifthLine();
-QHBoxLayout *sixthLine();
+QHBoxLayout *sixthLine(int*);
 QHBoxLayout *seventhLine();
 
 #endif // VCOS_H
