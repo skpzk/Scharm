@@ -201,6 +201,7 @@ QHBoxLayout *sixthLine(int *stretches){
 
     QWidget *quantGroup = new QWidget;
 	quantGroup->setContentsMargins(0, 0, 0, 0);
+	quantGroup->setObjectName("quantizeGroup");
 
     for(int i=0; i<4; i++){
 		Radio *quantRadio = new Radio(QString::fromStdString(quantizes[i]), i);
@@ -211,9 +212,9 @@ QHBoxLayout *sixthLine(int *stretches){
 
 		vboxquant->addWidget(quantRadio);
 		// quantGroup.addButton(quantRadio)
-		vboxquant->setStretch(i +1, 1);
+		vboxquant->setStretch(i + 1, 1);
     }
-	// quantRadio.setChecked(True)
+	// quantRadio->setChecked(true);
 
 	QLabel *label = new QLabel("Quantize");
 	label->setAlignment(Qt::AlignCenter);
@@ -250,15 +251,11 @@ QHBoxLayout *seventhLine(){
     knobType kt[] = {vco1, vco2};
 
     for(int i=0; i < 4; i++){
-		// knob = Knob.Knob(3, titles[i])
-		// QDial *knob = new QDial;
 		Knob *knob = new Knob;
 		knob->setText(titles[i%2]);
 		knob->setStyleSheet(
 			defaultKnobStyleSheet(kt[i/2]));
-        
 
-		// knob.setStyleSheet(knobDefaultStyleSheet('general'))
 		// knob.checkState()
 		// if titles[i] == "Tempo":
 		// State.params.setCallback("activetempo", knob.sequencerCallback)

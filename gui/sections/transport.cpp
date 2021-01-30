@@ -39,13 +39,14 @@ QWidget *createTransportSection(Window* parent){
 
 	hbox1->setSpacing(10);
 	hbox2->setSpacing(10);
-	hbox1->setContentsMargins(5, 10, 5, 10);
-	hbox2->setContentsMargins(5, 0, 5, 5);
+	hbox1->setContentsMargins(5, 10, 5, 5);
+	hbox2->setContentsMargins(5, 5, 5, 10);
 
 	section->vbox->addLayout(hbox1);
 	section->vbox->addLayout(hbox2);
-	section->vbox->setStretch(1, 1);
-	section->vbox->setStretch(2, 1);
+	section->vbox->setStretch(0, 0);
+	section->vbox->setStretch(1, 2);
+	section->vbox->setStretch(2, 2);
 
     return section;
     // return box;

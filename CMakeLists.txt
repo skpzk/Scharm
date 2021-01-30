@@ -22,12 +22,14 @@ set(SOURCES
     gui/sections/sequencer.cpp  gui/sections/sequencer.h
     gui/sections/rhythm.cpp     gui/sections/rhythm.h
     gui/sections/vcos.cpp       gui/sections/vcos.h
+    gui/sections/patchbay.cpp       gui/sections/patchbay.h
 
     gui/widgets/sectionLabel.cpp    gui/widgets/sectionLabel.h
     gui/widgets/knob.cpp            gui/widgets/knob.h
     gui/widgets/button.cpp          gui/widgets/button.h
     gui/widgets/waveSlider.cpp      gui/widgets/waveSlider.h
     gui/widgets/radio.cpp           gui/widgets/radio.h
+    gui/widgets/patchpoint.cpp      gui/widgets/patchpoint.h
 )
 
 

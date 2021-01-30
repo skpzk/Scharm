@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QMainWindow>
+#include <QSize>
 
 #include "gui/window.h"
 #include "scharm.h"
@@ -12,6 +13,8 @@ int main(int argc, char **argv) {
 
 	Window window;
     window.show();
+
+    window.resize(QSize(950, 620));
 
     Scharm scharm;
 
