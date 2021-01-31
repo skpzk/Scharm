@@ -45,63 +45,6 @@ void Radio::computeSizeFromContainingWidgetSize(float w, float h, float* out){
     out[1] = out[0] * fontsizefactor;
 }
 
-// void Radio::resizeEvent(QResizeEvent* event){
-//     paintSize = 10;
-//     fontsize = 5;
-//     QWidget *parent = this->topLevelWidget();
-//     // print(parent)
-//     // QList<T> radios = parent->findChildren(QRegularExpression('QWidget'));
-//     // QList<QWidget> radios = parent->findChildren(QWidget);
-//     QList<Radio *> widgets = parent->findChildren<Radio *>("");
-//     int lenList = widgets.size();
-
-//     // for(int i=0; i<lenList; i++){
-//     //     cout << widgets[i]->text.toStdString() << endl;
-//     // }
-    
-//     this->computeSize();
-//     float minsize = this->paintSize;
-//     for(int i=0; i<lenList; i++){
-//         // cout << widgets[i]->text.toStdString() << endl;
-//         if(widgets[i] != this){
-//             widgets[i]->computeSize();
-//             minsize = min(minsize, widgets[i]->paintSize);
-//             // cout << "minsize = " <<  minsize << endl;
-//         }
-//     }
-
-//     if(minsize > 0){
-//         // cout << "found minsize !\n";
-//         paintSize = minsize;
-//         for(int i=0; i<lenList; i++){
-//             if(widgets[i]->paintSize != minsize){
-//                 widgets[i]->paintSize = minsize;
-//                 widgets[i]->repaint();
-//             }
-//         }
-//         QList<QLabel *> labels = parent->findChildren<QLabel *>("");
-//         int lenLabels = labels.size();
-
-//         cout << "len labels = " << lenLabels << endl;
-//         // for(int j=0; j<lenLabels; j++){
-//         //     cout << "text = " << labels[j]->text().toStdString() << endl;
-//         // }
-        
-//         for(int j=0; j<lenLabels; j++){
-//             if(labels[j]->text() == "Range" || labels[j]->text() == "Quantize"){
-//                 cout << "text = " << labels[j]->text().toStdString() << endl;
-//                 cout << "fontsize = " << fontsize << "label fontsize = " << labels[j]->font().pointSizeF() << endl;
-//                 if(fontsize != 0 && (labels[j]->font().pointSizeF() != fontsize)){
-//                     QFont font = labels[j]->font();
-//                     font.setPointSizeF(fontsize);
-//                     // labels[j]->setFont(font);
-//                 }
-//             }
-//         }
-//     }
-//     event->accept();
-// }
-
 void Radio::paintEvent(QPaintEvent*){
 
     QStyleOption opt = QStyleOption();
@@ -109,18 +52,7 @@ void Radio::paintEvent(QPaintEvent*){
     opt.initFrom(this);
     QPainter painter(this);
 
-    // print("minimum size : ", self.minimumSize())
-    // print("radio: hasHforW : ", self.hasHeightForWidth())
-    // print("radio: size : ", self.size())
-    // print("radio : minimumSizeHint() :", self.minimumSizeHint())
-
-    // s = self.style()
-
-    // s.drawPrimitive(QStyle.PE_Widget, opt, painter, self)
-
-    // this->computeSize();
     float size = paintSize;
-    // size = np.min([1/8 * self.width(), self.height()/4])
 
     float linewidth = 1;
 

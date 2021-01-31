@@ -125,40 +125,19 @@ QWidget *Window::createBottomControls(){
 
 void Window::resizeEvent(QResizeEvent* event){
     QMainWindow::resizeEvent(event);
-    float paintSize = 10;
-    // float fontsize = 5;
-
-    // print(parent)
-    // QList<T> radios = parent->findChildren(QRegularExpression('QWidget'));
-    // QList<QWidget> radios = parent->findChildren(QWidget);
+    
     QList<Radio *> widgets = this->findChildren<Radio *>("");
     QList<QWidget *> groupWidgets = this->findChildren<QWidget *>("quantizeGroup");
     int lenList = widgets.size();
 
-    // for(int i=0; i<lenList; i++){
-    //     cout << widgets[i]->text.toStdString() << endl;
-    // }
-    for(int i=0; i<groupWidgets.size(); i++){
-        cout << groupWidgets[i]->objectName().toStdString() << endl;
-    }
-
-    cout << "size : \n";
-    cout << groupWidgets[0]->width() << endl; 
-    cout << groupWidgets[0]->height() << endl; 
-
     float sizes[2];
 
     Radio::computeSizeFromContainingWidgetSize(groupWidgets[0]->width(), groupWidgets[0]->height()/7, sizes);
-
-    for(int i=0; i<2; i++){
-        cout << sizes[i] << endl;
-    }
-    
+      
     float minsize = sizes[0], fontsize = sizes[1];
 
     if(minsize > 0){
-        // cout << "found minsize !\n";
-        paintSize = minsize;
+        
         for(int i=0; i<lenList; i++){
             if(widgets[i]->paintSize != minsize){
                 widgets[i]->paintSize = minsize;
@@ -168,22 +147,15 @@ void Window::resizeEvent(QResizeEvent* event){
         QList<QLabel *> labels = this->findChildren<QLabel *>("");
         int lenLabels = labels.size();
 
-        cout << "len labels = " << lenLabels << endl;
-        // for(int j=0; j<lenLabels; j++){
-        //     cout << "text = " << labels[j]->text().toStdString() << endl;
-        // }
 
-        
-        
         for(int j=0; j<lenLabels; j++){
             if(labels[j]->text() == "Range" || labels[j]->text() == "Quantize"){
-                cout << "text = " << labels[j]->text().toStdString() << endl;
-                cout << "fontsize = " << fontsize << "label fontsize = " << labels[j]->font().pointSizeF() << endl;
+                
                 if(fontsize != 0 && (labels[j]->font().pointSizeF() != fontsize)){
                     QFont font = labels[j]->font();
                     font.setPointSizeF(fontsize);
                     labels[j]->setFont(font);
-                    // labels[j]->repaint();
+                    labels[j]->repaint();
                 }
             }
         }
