@@ -47,6 +47,7 @@ public:
     int sizeType;
     float fontsize1;
 
+    void checkState();
 
 private:
 
@@ -66,6 +67,11 @@ private:
     QColor ringColor;
 
     bool coloredTitle = false;
+    
+    string stateKey;
+
+public slots:
+    void warnState(int);
     
 protected:
     // void mousePressEvent(QMouseEvent *ev) override;

@@ -5,6 +5,7 @@
 #include <QBrush>
 
 #include "../defs.h"
+#include "../../utils/utils.h"
 #include <string>
 
 Button::Button(QWidget * parent,

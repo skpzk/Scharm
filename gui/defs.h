@@ -15,9 +15,7 @@ QString defaultKnobStyleSheet(knobType type);
 QString mainWindowStyleSheet();
 QString buttonDefaultStyleSheet();
 
-string replace(string base, string oldValue, string newValue);
-string replaceAll(string base, string oldValue, string newValue);
-vector<string> split(string stringToBeSplitted, string delimeter);
+
 
 class Theme{
     public:

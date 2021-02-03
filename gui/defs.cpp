@@ -1,4 +1,5 @@
 #include "defs.h"
+#include "../utils/utils.h"
 
 
 Theme::Theme(){
@@ -59,37 +60,6 @@ QString defaultKnobStyleSheet(knobType type){
     return QString::fromStdString(style);
 };
 
-string replace(string base, string oldValue, string newValue){
-    size_t pos = base.find(oldValue);
-    if (pos == string::npos) return base;
-    return base.replace(pos, oldValue.length(), newValue);
-}
-string replaceAll(string base, string oldValue, string newValue){
-    string returnvalue = "";
-    while(returnvalue.compare(base)){
-        returnvalue = base;
-        base = replace(base, oldValue, newValue);
-    }
-    return returnvalue;
-}
-vector<string> split(string stringToBeSplitted, string delimeter)
-{
-    vector<string> splittedString;
-    int startIndex = 0;
-    int endIndex = 0;
-    while( (endIndex = stringToBeSplitted.find(delimeter, startIndex)) < stringToBeSplitted.size() )
-    {
-        string val = stringToBeSplitted.substr(startIndex, endIndex - startIndex);
-        splittedString.push_back(val);
-        startIndex = endIndex + delimeter.size();
-    }
-    if(startIndex < stringToBeSplitted.size())
-    {
-        string val = stringToBeSplitted.substr(startIndex);
-        splittedString.push_back(val);
-    }
-    return splittedString;
-}
 
 QString buttonDefaultStyleSheet(){
     Theme theme;

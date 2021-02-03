@@ -7,16 +7,32 @@
 #include "gui/window.h"
 #include "scharm.h"
 
+/*
+Interface :
+ tbd:
+  patchcords
+  holdbutton
+
+  communication with state
+
+  proper dark mode
+
+State :
+ tbd: 
+  everything
+
+*/
+
 int main(int argc, char **argv) {
     printf("Hello\n");
     QApplication app(argc, argv);
+
+    Scharm scharm;
 
 	Window window;
     window.show();
 
     window.resize(QSize(950, 620));
-
-    Scharm scharm;
 
 	app.exec();
 

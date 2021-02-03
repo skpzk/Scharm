@@ -9,6 +9,9 @@ class Scharm{
     public:
         Scharm();
         void close();
+        int test = 12;
+
+        static void callback(void*, float);
 };
 
 

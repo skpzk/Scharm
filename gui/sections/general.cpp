@@ -19,7 +19,7 @@ QWidget *createGeneralSection(Window* parent){
 			defaultKnobStyleSheet(general));
 
 		// knob.setStyleSheet(knobDefaultStyleSheet('general'))
-		// knob.checkState()
+		knob->checkState();
 		// if titles[i] == "Tempo":
 		// State.params.setCallback("activetempo", knob.sequencerCallback)
 

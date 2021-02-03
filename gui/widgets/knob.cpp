@@ -10,8 +10,12 @@
 #include "knob.h"
 
 #include "../utils.h"
+#include "../../utils/utils.h"
+
+#include "../../state/state.h"
 
 #include <set>
+
 
 std::set<std::string> implementedKnobs = {};
 
@@ -31,14 +35,39 @@ Knob::Knob(QWidget * parent,
     QDial::setRange(0,127);
     ringColor = QColor("black");
     sizeType = 1;
+    stateKey = text_.toStdString();
+    lowerWithoutSpaces(&stateKey);
+
+    // this->valueChanged.connect();
+    // connect(lineedit, &QLineEdit::textChanged, this, &YourWidget::MySlot);
+    connect(this, &QDial::valueChanged, this, &Knob::warnState);
 }
 
 void Knob::setText(string text){
     text_ = QString::fromStdString(text);
+    stateKey = text_.toStdString();
+    lowerWithoutSpaces(&stateKey);
 }
 // void Knob::mousePressEvent(QMouseEvent *ev){
 
 // }
+
+void Knob::warnState(int _){
+    // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
+    // # print("value = ", self.value())
+    cout << "warning state :\n";
+    cout << "key = " << stateKey << ", value = " << (float) value() / maximum() << endl;
+    State::params(stateKey)->setValue((float) value() / maximum());
+}
+
+void Knob::checkState(){
+    // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
+    // # print("value = ", self.value())
+    cout << "checking state :\n";
+    cout << "key = " << stateKey << ", value = " << (float) *State::params(stateKey) << endl;
+    // State::params(stateKey)->setValue(value() / maximum());
+    setValue(*State::params(stateKey) * maximum());
+}
 
 void Knob::setRingColor(QColor color){
     ringColor = QColor(color);

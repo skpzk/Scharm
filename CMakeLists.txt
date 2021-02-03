@@ -6,9 +6,15 @@ set(CMAKE_AUTOMOC ON)
 include(CTest)
 enable_testing()
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 set(SOURCES
     scharm.cpp              scharm.h
+
+    utils/utils.cpp         utils/utils.h
+    utils/fileio.cpp         utils/fileio.h
 
     gui/window.cpp          gui/window.h 
     gui/utils.cpp           gui/utils.h
@@ -30,6 +36,8 @@ set(SOURCES
     gui/widgets/waveSlider.cpp      gui/widgets/waveSlider.h
     gui/widgets/radio.cpp           gui/widgets/radio.h
     gui/widgets/patchpoint.cpp      gui/widgets/patchpoint.h
+
+    state/state.cpp     state/state.h
 )
 
 

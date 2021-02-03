@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef GUIUTILS_H
+#define GUIUTILS_H
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -12,4 +12,4 @@ void layoutConf(QVBoxLayout *);
 float rad2deg(float);
 float deg2rad(float);
 
-#endif // UTILS_H
+#endif // GUIUTILS_H
