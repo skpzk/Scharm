@@ -2,10 +2,17 @@
 #include "section.h"
 #include "../utils.h"
 
+#include "../widgets/patchcord.h"
+
 
 
 #include <QGridLayout>
 #include <QString>
+#include <QStyleOption>
+#include <QPainter>
+#include <QStyle>
+#include <QSize>
+
 #include <vector>
 
 Patchbay::Patchbay(QWidget *parent):
@@ -73,33 +80,131 @@ QWidget(parent)
     section->vbox->addLayout(grid, 1);
     /*
 
-    vbox.setStretch(0, 0)
-		vbox.addLayout(grid, 1)
+    text = """<html><head/><body><p>IN / <span style=" color:%s;background-color:%s">OUT</span></p></body></html>""" %(backgroundColor, pointColor)
 
-		text = """<html><head/><body><p>IN / <span style=" color:%s;background-color:%s">OUT</span></p></body></html>""" %(backgroundColor, pointColor)
+    # print("text = ", text)
 
-		# print("text = ", text)
-
-		fontsize = .38 * 36 / 2
-		# print("fontsize = ", fontsize)
+    fontsize = .38 * 36 / 2
+    # print("fontsize = ", fontsize)
 
 
-		label = Qtw.QLabel(text)
-		label.setAlignment(QtCore.Qt.AlignCenter)
-		font = label.font()
-		font.setPointSizeF(fontsize)
-		label.setFont(font)
-		vbox.addWidget(label)
+    label = Qtw.QLabel(text)
+    label.setAlignment(QtCore.Qt.AlignCenter)
+    font = label.font()
+    font.setPointSizeF(fontsize)
+    label.setFont(font)
+    vbox.addWidget(label)
 
-		self.setLayout(vbox)
+    self.setLayout(vbox)
 
-		self.pcs = PatchCordList()
+    self.pcs = PatchCordList()
 
-		self.displayPp = "all"  # or "in" or "out"
+    self.displayPp = "all"  # or "in" or "out"
 
-		self.resizePcs()
+    self.resizePcs()
 
-		self.checkState()
+    self.checkState()
     */
+
+   this->pcs = new PatchCordList;
     
+}
+
+
+void Patchbay::createPC(Patchpoint* pp){
+
+    cout << "Patchbay :: creating pc...\n";
+
+    PatchCord *pc = new PatchCord(this);
+
+    cout << "setting points \n";
+    pc->setStartPp(pp);
+    pc->setPos(pp);
+
+
+
+    cout << "done\n";
+
+    displayPp = pc->endPoint_io;
+
+    cout << "adding pc to list\n";
+    pcs->add(pc);
+
+    cout << "PC created\n";
+}
+
+void Patchbay::moveLastPC(QPointF pos){
+    pcs->last()->setPos(pos);
+    // # print(type(pos))
+    repaint();
+}
+
+void Patchbay::disposeOfLastPc(){
+    PatchCord *pc = pcs->last();
+    pcs->remove(pc);
+    pc->deleteFromPpLists();
+    pc->deleteLater();
+    displayPp = "all";
+}
+
+void Patchbay::findReleasePp(QPointF pos){
+
+    bool isPpFound = false;
+    Patchpoint *pprelease = nullptr;
+
+    for(int i=0; i<pps.size(); i++){
+        tie(isPpFound, pprelease) = pps[i]->isMouseReleaseOnPp(pos);
+        if(isPpFound){
+            break;
+        }
+    }
+
+    if(!isPpFound){
+        disposeOfLastPc();
+    }else{
+        if(pprelease->ioType != pcs->last()->endPoint_io){
+            disposeOfLastPc();
+        }else{
+            pcs->last()->setEndPp(pprelease);
+            pcs->last()->connectPc();
+
+            displayPp = "all";
+        }
+
+    }
+    repaint();
+}
+
+void Patchbay::movePC(PatchCord* pc, Patchpoint *pp){
+    pcs->add(pc);
+    pcs->last()->disconnectPc(pp);
+    displayPp = pcs->last()->endPoint_io;
+    repaint();
+}
+
+void Patchbay::resizeEvent(QResizeEvent* event){
+    resizePcs();
+}
+
+void Patchbay::resizePcs(){
+    for(int i=0; i<pcs->pcs.size(); i++){
+        // cout << "Patchbay : pc[" << i << "]->isHovered = " << pcs->pcs[i]->isHovered << endl;
+        // cout << "No bug so far" << endl;
+        // cout << "size = " << size().width() << ", " << size().height() << endl;
+        pcs->pcs[i]->resize(this->size());
+    }
+}
+
+void Patchbay::paintEvent(QPaintEvent *ev){
+
+    QStyleOption opt = QStyleOption();
+    opt.initFrom(this);
+    QPainter painter(this);
+
+    // painter.setBackgroundMode(Qt.TransparentMode)
+    QStyle *s = this->style();
+
+    s->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+
+    resizePcs();
 }

@@ -224,6 +224,7 @@ void Knob::paintEvent(QPaintEvent*){
     f.setPointSizeF(fontsize1);
     painter.setFont(f);
     // painter.setBrush(QColor("transparent"));
+    painter.setBackgroundMode(Qt::TransparentMode);
     // painter.drawRect(textRect_)
     painter.drawText(textRect_, Qt::AlignHCenter | Qt::AlignTop, text_);
     // painter.drawText(textRect_, Qt.AlignHCenter | Qt.AlignTop, str(fontsize1))

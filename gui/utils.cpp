@@ -24,3 +24,6 @@ float rad2deg(float rad){
 float deg2rad(float deg){
 	return deg * M_PI / 180.;
 }
+float distance(QPointF a, QPointF b){
+	return sqrt(pow(a.x() - b.x(), 2) + pow(a.y() - b.y(), 2));
+}

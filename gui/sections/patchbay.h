@@ -8,6 +8,7 @@
 
 #include "../widgets/sectionLabel.h"
 #include "../widgets/patchpoint.h"
+#include "../widgets/patchcordList.h"
 
 using namespace::std;
 
@@ -22,9 +23,22 @@ class Patchbay : public QWidget{
 
         string displayPp = "all";
 
+        PatchCordList * pcs;
+        void createPC(Patchpoint*);
+        void moveLastPC(QPointF);
+        void findReleasePp(QPointF);
+        void disposeOfLastPc();
+
+        void movePC(PatchCord* pac, Patchpoint *pp);
+
     private:
         vector<Patchpoint *> pps;
-        
+        void resizePcs();
+
+
+    protected:
+        virtual void paintEvent(QPaintEvent*) override;
+        void resizeEvent(QResizeEvent* event);
 
 };
 

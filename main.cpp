@@ -14,12 +14,26 @@ Interface :
   holdbutton
 
   communication with state
+  - warnstate and check state are implemented for knobs
 
-  proper dark mode
+  proper dark mode : 
+  - knob text color isn't right
+
+  radios:
+  - add mouse press event
+
+  knobs :
+  - change statekeys of "stepX"
+
+  waveslider:
+  - add mousepressevent
+
 
 State :
  tbd: 
-  everything
+  patchbay
+  radios
+  wavesliders
 
 */
 

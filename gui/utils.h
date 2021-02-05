@@ -11,5 +11,6 @@ void layoutConf(QVBoxLayout *);
 
 float rad2deg(float);
 float deg2rad(float);
+float distance(QPointF, QPointF);
 
 #endif // GUIUTILS_H

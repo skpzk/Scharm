@@ -36,6 +36,8 @@ set(SOURCES
     gui/widgets/waveSlider.cpp      gui/widgets/waveSlider.h
     gui/widgets/radio.cpp           gui/widgets/radio.h
     gui/widgets/patchpoint.cpp      gui/widgets/patchpoint.h
+    gui/widgets/patchcordList.cpp   gui/widgets/patchcordList.h
+    gui/widgets/patchcord.cpp       gui/widgets/patchcord.h
 
     state/state.cpp     state/state.h
 )

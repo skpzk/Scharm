@@ -2,6 +2,7 @@
 
 #include <QSize>
 #include <QFontMetrics>
+#include <QMouseEvent>
 
 #include <cmath>
 #include <set>
@@ -32,6 +33,12 @@ QWidget(parent),
 
     center = QPointF(0, 0);
 
+	pcs = new PatchCordList;
+
+	hasPcGrabbed = false;
+
+	setMouseTracking(true);
+
 }
 
 void Patchpoint::setFixedSize(float size){
@@ -49,6 +56,109 @@ void Patchpoint::setPpColor(QColor color){
 
 QColor Patchpoint::getPpColor() const{
 	return ppColor;
+}
+
+QPointF Patchpoint::getCenter(){
+	computeCenter();
+	return this->mapToParent(center.toPoint());
+}
+void Patchpoint::setPcToHoveredIfCursorOnPp(QMouseEvent * event){
+	if(distance(event->pos(), center) < mainRadius){
+		for(int i=0; i<pcs->pcs.size(); i++){
+			cout << "is hovered" << endl;
+			pcs->pcs[i]->isHovered = true;
+			pcs->pcs[i]->repaint();
+		}
+	}else{
+		for(int i=0; i<pcs->pcs.size(); i++){
+			cout << "is not" << endl;
+			// print("is not")
+			pcs->pcs[i]->isHovered = false;
+			pcs->pcs[i]->repaint();
+		}
+	}
+}
+
+void Patchpoint::enterEvent(QEvent *ev){
+	// cout << "Enter event\n";
+	setPcToHoveredIfCursorOnPp((QMouseEvent*) ev);
+}
+
+void Patchpoint::leaveEvent(QEvent *ev){
+	// cout << "Leave event\n";
+	for(int i=0; i<pcs->pcs.size(); i++){
+		// cout << "is not" << endl;
+		// print("is not")
+		pcs->pcs[i]->isHovered = false;
+		pcs->pcs[i]->repaint();
+	}
+}
+
+void Patchpoint::mousePressEvent(QMouseEvent *ev){
+// def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+	cout << "mouse press   detected" << text_.toStdString() << endl;
+
+	if((this->pcs->is_empty()) || (ev->modifiers() == Qt::ControlModifier)){
+		cout << "Pb crate pc\n";
+
+		Patchbay *parent = (Patchbay*) this->parent();
+		parent->createPC(this);
+
+		hasPcGrabbed = true;
+	}else if(!(this->pcs->is_empty())){
+		// elif self has a pc, disconnect it from self
+
+		PatchCord *pc = pcs->last();
+		pcs->remove(pc);
+
+		Patchbay *parent = (Patchbay*) this->parent();
+		parent->movePC(pc, this);
+
+		hasPcGrabbed = true;
+
+	}
+
+/*
+	else if(!self.pcs.is_empty()){
+		// elif self has a pc, disconnect it from self
+		pc = self.pcs.last()
+		self.pcs.remove(pc)
+		self.parent().movePC(pc, self)
+		self.hasPcGrabbed = True
+	}
+	// else : ignore
+*/
+}
+void Patchpoint::mouseMoveEvent(QMouseEvent *ev){
+	// cout << "mouse move detected :" << text_.toStdString() << endl;
+	if(ev->buttons() == Qt::LeftButton && hasPcGrabbed){
+		// send mouse position to pb
+		Patchbay *parent = (Patchbay*) this->parent();
+		parent->moveLastPC(this->mapToParent(ev->pos()));
+	}else{
+		// set pc to hovered if the mouse in on the pp
+		// cout << "is Pc hovered ?\n"; 
+		setPcToHoveredIfCursorOnPp(ev);
+	}
+}
+void Patchpoint::mouseReleaseEvent(QMouseEvent *ev){
+	if(hasPcGrabbed){
+		hasPcGrabbed = false;
+		Patchbay *parent = (Patchbay*) this->parent();
+		// parent->moveLastPC(this->mapToParent(ev->pos()));
+		parent->findReleasePp(this->mapToParent(ev->pos()));
+	}
+}
+/*
+# detect pp of release
+# if it exist and is of the good io type, connect pc to pp
+# if not, delete pc
+*/
+tuple<bool, Patchpoint*> Patchpoint::isMouseReleaseOnPp(QPointF p){
+	if(distance(getCenter(), p) < mainRadius){
+		return make_tuple(true, this);
+	}
+	return make_tuple(false, this);
 }
 
 void Patchpoint::computeCenter(){
