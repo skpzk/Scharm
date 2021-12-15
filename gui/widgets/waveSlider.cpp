@@ -90,19 +90,43 @@ QPolygonF compute_arrow(float x0, float y0, float width, float height){
 }
 
 WaveSlider::WaveSlider(int nb_items, int dir): QSlider(nullptr){
-    steps = nb_items;
-    setMaximum(nb_items - 1);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	steps = nb_items;
+	setMaximum(nb_items - 1);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    handlePos = QPointF(0, 0);
-    barRect = QRectF(0, 0, 0, 0);
+	handlePos = QPointF(0, 0);
+	barRect = QRectF(0, 0, 0, 0);
 
-    this->direction = dir;
+	this->direction = dir;
 
-    // stateKey = "";
-    // self.valueChanged.connect(self.warnState)
+	// stateKey = "";
+	// self.valueChanged.connect(self.warnState)
 
-    setValue(0);
+	setValue(0);
+}
+
+int WaveSlider::getMousePositionInSteps(QPoint mousePos){
+	float dist = abs(barRect.y() + barRect.height() - mousePos.y());
+	return floor(dist / barRect.height() * steps);
+}
+
+void WaveSlider::mousePressEvent(QMouseEvent *ev){
+	// if mouse is on handle : grab and move the handle
+	// else : directly move handle to the position of the mouse
+	if(barRect.contains(ev->pos())){
+		this->setValue(this->getMousePositionInSteps(ev->pos()));
+	}
+}
+
+void WaveSlider::mouseMoveEvent(QMouseEvent *ev){
+	if(barRect.contains(ev->pos())){
+		this->setValue(this->getMousePositionInSteps(ev->pos()));
+	}
+}
+
+
+void WaveSlider::mouseReleaseEvent(QMouseEvent *ev){
+	;
 }
 
 void WaveSlider::paintEvent(QPaintEvent*){

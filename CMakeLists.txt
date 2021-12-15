@@ -40,18 +40,31 @@ set(SOURCES
     gui/widgets/patchcord.cpp       gui/widgets/patchcord.h
 
     state/state.cpp     state/state.h
+
+    audioApi/audio.cpp      audioApi/audio.h
+
+    audioLib/audioObject.cpp    audioLib/audioObject.h
+    audioLib/osc.cpp            audioLib/osc.h
 )
 
 
 
 add_executable(scharm main.cpp ${SOURCES})
 
+find_package(Threads REQUIRED)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 
 if (UNIX)
     target_link_libraries(scharm  
         Qt5::Widgets
-    )
+        /usr/local/lib/libportaudio.a
+        Threads::Threads
+        pthread
+        asound
+        jack
+        rt
+        m
+        )
 endif (UNIX)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

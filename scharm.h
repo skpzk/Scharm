@@ -2,8 +2,9 @@
 #define SCHARM_H
 
 #include <iostream>
+#include "audioApi/audio.h"
 
-using namespace::std;
+
 
 class Scharm{
     public:
@@ -12,6 +13,8 @@ class Scharm{
         int test = 12;
 
         static void callback(void*, float);
+
+        Audio * audio;
 };
 
 

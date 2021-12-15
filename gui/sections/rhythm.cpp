@@ -19,7 +19,7 @@ QWidget *createRhythmSection(Window* parent){
 		Knob *knob = new Knob;
 		knob->setText("Step" + to_string(i+1));
 		knob->setStyleSheet(
-			defaultKnobStyleSheet(seq));
+			defaultKnobStyleSheet(rhythm));
         knob->setMinimum(1);
         knob->setMaximum(16);
 

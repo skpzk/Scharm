@@ -79,6 +79,9 @@ QColor Knob::getRingColor() const{
 
 void Knob::paintEvent(QPaintEvent*){
 
+    // extent is the angle of the colored line around the knob, 
+    // and of the total travel of the knob
+    // offset is used to display it with vertical symmetry
     float extent = 1.5 * M_PI;
     float offset = 1.25 * M_PI;
 
@@ -167,7 +170,7 @@ void Knob::paintEvent(QPaintEvent*){
 
     painter.drawArc(rectangle, start_16deg, extent_16deg);
 
-    //draw inner circle
+    //draw inner disk
 
     painter.setBackgroundMode(Qt::OpaqueMode);
 
@@ -177,7 +180,8 @@ void Knob::paintEvent(QPaintEvent*){
     painter.setPen(pen);
     painter.setBrush(QColor(bgColor));
     if(implementedKnobs.find(this->text_.toStdString()) == implementedKnobs.end()){
-        painter.setBrush(QBrush(QColor("#cccccc")));
+        painter.setBrush(QBrush(QColor("#393939")));
+        // painter.setBrush(QBrush(QColor("red")));
     }
 
     float radius_inner = 15./20. * radius;

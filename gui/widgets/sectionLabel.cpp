@@ -1,5 +1,6 @@
 #include "sectionLabel.h"
 
+using namespace::std;
 
 SectionLabel::SectionLabel(QWidget* parent, const QString& text):
 QLabel(parent), text_(text)

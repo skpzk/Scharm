@@ -2,6 +2,8 @@
 
 #include "state/state.h"
 
+using namespace::std;
+
 void setGuiThing(float value_){
     cout << "setting gui thing, value = " << value_ << endl;
 }
@@ -40,6 +42,12 @@ Scharm::Scharm(){
 
     this->test = 30;
     State::params("test")->call(10.);
+
+    AudioObject *dummy = new AudioObject;
+
+    this->audio = new Audio;
+    this->audio->setInput(dummy);
+    this->audio->start();
 
     // State::read();
 }

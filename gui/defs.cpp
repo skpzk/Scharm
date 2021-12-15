@@ -4,7 +4,7 @@
 
 Theme::Theme(){
     darkTheme = true;
-    darkTheme = false;
+    // darkTheme = false;
     if(darkTheme){
         backgroundColor = "#111111";
         buttonBackground = "#919191";
@@ -127,6 +127,10 @@ QString mainWindowStyleSheet(){
 		"color: pointColor;"
 		"background-color: backgroundColor;"
 		"qproperty-ppColor: ppColorName;"
+	"}"
+	"Knob{"
+		"color: pointColor;"
+		"background-color: backgroundColor;"
 	"}";
 
     styleSheet = replaceAll(styleSheet, "backgroundColor", theme.backgroundColor);

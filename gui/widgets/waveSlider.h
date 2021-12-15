@@ -10,6 +10,8 @@
 #include <QPainterPath>
 #include <QPolygonF>
 
+#include <QMouseEvent>
+
 using namespace::std;
 
 QPainterPath compute_tri_path(float x0, float y0, float width, float height);
@@ -39,6 +41,13 @@ private:
     int steps, direction;
     QPointF handlePos;
     QRectF barRect;
+
+    int getMousePositionInSteps(QPoint);
+
+protected:
+    void mousePressEvent(QMouseEvent *ev) override;
+    void mouseMoveEvent(QMouseEvent *ev) override;
+    void mouseReleaseEvent(QMouseEvent *ev) override;
 
 };
 

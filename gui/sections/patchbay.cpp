@@ -18,7 +18,7 @@
 Patchbay::Patchbay(QWidget *parent):
 QWidget(parent)
 {
-    Section *section = new Section(parent, "Patchbay");
+    Section *section = new Section(parent, "Patchbay  ");
 
     this->setLayout(section->vbox);
 
