@@ -14,7 +14,8 @@ set(SOURCES
     scharm.cpp              scharm.h
 
     utils/utils.cpp         utils/utils.h
-    utils/fileio.cpp         utils/fileio.h
+    utils/fileio.cpp        utils/fileio.h
+    utils/logger.cpp        utils/logger.h
 
     gui/window.cpp          gui/window.h 
     gui/utils.cpp           gui/utils.h

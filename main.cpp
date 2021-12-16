@@ -7,6 +7,8 @@
 #include "gui/window.h"
 #include "scharm.h"
 
+#include "utils/logger.h"
+
 /*
 Last thing I was doing :
   interface :
@@ -14,6 +16,11 @@ Last thing I was doing :
   + waveslider behaves incorrectly :
     + mouse event are detected on a height equivalent of that of the VCO1 knob instead of the painted area
     + mouse event for the right ws are detected on the symbols, not the selector
+  Logger :
+    + finished testing singleton design pattern
+    + ISO C++ forbids converting a string constant to ‘char*’ ?wut? 
+      -> solved by adding 'const' to char* msg
+    - update every logger function accordingly
 
 
 Interface :
@@ -53,21 +60,39 @@ Improvement ideas:
 
 */
 
+// for sleep function :
+#include <unistd.h>
+
 int main(int argc, char **argv) {
     printf("Hello\n");
-    QApplication app(argc, argv);
 
-    Scharm scharm;
+    // Logger *logger = Logger::getInstance();
 
-	Window window;
-    window.show();
+    // logger->info("testing logger");
 
-    window.resize(QSize(950, 620));
+    // (*logger)<<"test";
 
-	app.exec();
+    // cout << logger << "test";
 
-    printf("app.exec closed\n");
+    LoggerInterface logger;
 
-    scharm.close();
+    logger.info("test logger");
+    
+
+    // Logger::test();
+    // QApplication app(argc, argv);
+
+    // Scharm scharm;
+
+	// Window window;
+    // window.show();
+
+    // window.resize(QSize(950, 620));
+
+	// app.exec();
+
+    // printf("app.exec closed\n");
+
+    // scharm.close();
 
 }

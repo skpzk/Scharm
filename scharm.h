@@ -7,14 +7,14 @@
 
 
 class Scharm{
-    public:
-        Scharm();
-        void close();
-        int test = 12;
+	public:
+		Scharm();
+		void close();
+		int test = 12;
 
-        static void callback(void*, float);
+		static void callback(void*, float);
 
-        Audio * audio;
+		Audio * audio;
 };
 
 
