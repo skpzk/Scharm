@@ -70,6 +70,8 @@ private:
     
     string stateKey;
 
+    bool debug_print_rects;
+
 public slots:
     void warnState(int);
     

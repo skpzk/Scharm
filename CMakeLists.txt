@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
+
 set(SOURCES
     scharm.cpp              scharm.h
 
@@ -49,6 +50,7 @@ set(SOURCES
     audioLib/objects/osc.cpp            audioLib/objects/osc.h
     audioLib/objects/Wave.cpp           audioLib/objects/Wave.h
     audioLib/objects/mixer.cpp          audioLib/objects/mixer.h
+    audioLib/objects/filter.cpp         audioLib/objects/filter.h
 
     audioLib/utils/SignalUtils.cpp      audioLib/utils/SignalUtils.h
     audioLib/utils/midi.cpp             audioLib/utils/midi.h
@@ -62,6 +64,15 @@ add_executable(scharm main.cpp ${SOURCES})
 find_package(Threads REQUIRED)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 
+find_package(Matplot++ REQUIRED)
+
+# add_executable(scharm main.cpp)
+# target_link_libraries(scharm PUBLIC Matplot++::matplot)
+
+
+
+# list(APPEND CMAKE_MODULE_PATH "/usr/include/matplotlib-cpp/")
+
 if (UNIX)
     target_link_libraries(scharm  
         Qt5::Widgets
@@ -73,8 +84,12 @@ if (UNIX)
         rt
         m
         dl
+        Matplot++::matplot
         )
 endif (UNIX)
+
+# -I/usr/local/include/python2.7 \
+# -I/usr/local/lib/python2.7/site-packages/numpy/core/include -lpython2.7
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

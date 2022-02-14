@@ -18,3 +18,14 @@ void initBuffer(sample_t* buffer, int frames, int value){
         *buffer++ = value;
     }
 }
+
+void initBuffer(sample_t* buffer, int value){
+    for(int i=0; i<FRAMES_PER_BUFFER; i++){     
+        *buffer++ = value;
+        *buffer++ = value;
+    }
+}
+
+void initBuffer(sample_t* buffer){
+    initBuffer(buffer, 0);
+}

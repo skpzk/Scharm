@@ -8,8 +8,8 @@ Wave::Wave(int type) {
         this->sine();
         break;
 
-    case 1: //tri wave
-        this->tri();
+    case 1: //tri wave : created with a sqr wave, integrated by the oscillator
+        this->square();
         break;
 
     case 2: //saw wave
@@ -71,7 +71,7 @@ void Wave::tri(){
 void Wave::saw(){
   for(int i=0; i<TABLE_SIZE; i++ )
   {
-      this->wave[i] = SILENCE + (sample_t) (this->maxValue - 2. * this->maxValue
+      this->wave[i] = SILENCE + (sample_t) (-this->maxValue + 2. * this->maxValue
         * (float) i / TABLE_SIZE);
   }
 }
@@ -102,8 +102,8 @@ void WaveShape::selectWaveShape(int type) {
 void WaveShape::basicShapes()
 {
     this->addWave(new Wave(SINE));
-    this->addWave(new Wave(SQUARE));
-    this->addWave(new Wave(TRIANGLE));
+    this->addWave(new Wave(SQR));
+    this->addWave(new Wave(TRI));
     this->addWave(new Wave(SAW));
 }
 

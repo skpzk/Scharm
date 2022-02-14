@@ -6,6 +6,7 @@
 typedef struct 
 {
   std::string freq = "";
+  std::string reso = "";
 	std::string quant = "quantradio";
 	std::string wave = "";
 	std::string volume = "";

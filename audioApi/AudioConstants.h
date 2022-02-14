@@ -11,12 +11,13 @@
 #define FORMAT      paInt32
 typedef int   sample_t;
 #define SILENCE     ((sample_t)0x00)
-#define MAX         ((sample_t)1<<30)
+// #define MAX         ((sample_t)1<<30)
+#define MAX         ((sample_t)1<<27)
 
 #define SINE     (0)
-#define SAW      (1)
-#define TRIANGLE (2)
-#define SQUARE   (3)
+#define TRI      (1)
+#define SAW      (2)
+#define SQR      (4)
 
 
 #endif

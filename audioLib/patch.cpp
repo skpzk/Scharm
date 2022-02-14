@@ -2,6 +2,7 @@
 
 #include "objects/mixer.h"
 #include "objects/osc.h"
+#include "objects/filter.h"
 
 Patch::Patch(){
   Mixer *mixer = new Mixer;
@@ -60,8 +61,15 @@ Patch::Patch(){
 
   mixer->addInput(vco2sub2);
 
+  Vcf * vcf = new Vcf();
 
-  this->outputObj = mixer;
+  vcf->stateKeys.freq = "cutoff";
+  vcf->stateKeys.reso = "reso";
+
+  vcf->setInput(mixer);
+
+
+  this->outputObj = vcf;
 }
 
 void Patch::output(void* out){

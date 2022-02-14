@@ -15,12 +15,13 @@ class Osc : public AudioObject{
 		Osc();
 
 		void output(void*);
-		void CVOutput(void*);
+		// void CVOutput(void*);
 
 		void setFreq(float);
 		void setNoteMidi(float);
 		void setWave(float);
 		StateKeys stateKeys;
+		double poly_blep(double t);
 
 	private:
 		// Wavetables sample_t
@@ -28,10 +29,16 @@ class Osc : public AudioObject{
 		float phaseIncrement;
 		float phase;
 
+		float lastOutput;
+
+
 	protected:
 		int vco_or_sub;// 0 is for vco, 1 is for sub
 		float freq;
 		float volume;
+
+		int waveType;
+
 		void updatePhaseIncrement();
 		void outputWave(void*);
 
@@ -51,7 +58,7 @@ class Vco : public Osc{
 		// gui values :
 		float knobFreq = 0;
 		int quantValue;
-		int waveType;
+		
 		void updateFreq();
 
 	protected:

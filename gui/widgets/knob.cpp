@@ -27,9 +27,9 @@ Knob::Knob(QWidget * parent,
     const QString& text,
     double knobRadius,
     double knobMargin): QDial(parent),
-  knobRadius_(knobRadius),
-  knobMargin_(knobMargin),
-  text_(text)
+    knobRadius_(knobRadius),
+    knobMargin_(knobMargin),
+    text_(text)
 {
     // Default range
     QDial::setRange(0,127);
@@ -41,6 +41,9 @@ Knob::Knob(QWidget * parent,
     // this->valueChanged.connect();
     // connect(lineedit, &QLineEdit::textChanged, this, &YourWidget::MySlot);
     connect(this, &QDial::valueChanged, this, &Knob::warnState);
+
+    debug_print_rects = true;
+    debug_print_rects = false;
 }
 
 void Knob::setText(string text){
@@ -117,6 +120,7 @@ void Knob::paintEvent(QPaintEvent*){
     painter.setBrush(QColor("transparent"));
 
     // uncomment the following line to draw outer rect
+    if(debug_print_rects)
     painter.drawRect(0, 0, QDial::width(), QDial::height());
 
     // No border

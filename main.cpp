@@ -17,9 +17,11 @@ Last thing I was doing :
   + write an extensive doc for params
   + correcting range for osc : can it have a quarter tone scale by default (no quantize)
   + adding check wavetype in vco, switching wavetype
-  - adding sub oscs
+  + adding sub oscs
     todo: change behaviour of quantize ET to mimic that of quantize JI
-          create file c_cpp_properties.json to include Qt5 lib
+  + adding a filter
+  - characterize the filter : what order ?
+  - integrate a moog filter, based on the pdf, see filter.cpp
 
 Interface :
  tbd:
@@ -55,7 +57,6 @@ State :
   patchbay
   radios
   wavesliders
-  - replace bad saving to file with a JSON
 
 */
 
@@ -68,6 +69,11 @@ BUGS :
         what():  std::bad_alloc
       Aborted (core dumped)
     No idea why.
+
+  - When two osc (typically two subs) have the same frequency, they can have opposite phases, thus cancelling each other
+    maybe I could find a way to synchronize their phases on some special conditions, 
+    like check if they have the same freq and then phase sync ?
+    this is especially noticeable with a square wave
 */
 
 /*
@@ -80,7 +86,7 @@ Improvement ideas:
 // for sleep function :
 #include <unistd.h>
 
-int main(int argc, char **argv) {
+int app(int argc, char **argv){
   printf("Hello\n");
 
   QApplication app(argc, argv);
@@ -97,5 +103,91 @@ int main(int argc, char **argv) {
   // printf("app.exec closed\n");
 
   scharm.close();
+  return 1;
+}
+#include <matplot/matplot.h>
+#include <cmath>
+#include <vector>
 
+#include "audioLib/objects/osc.h"
+#include "audioLib/objects/filter.h"
+#include "audioApi/AudioConstants.h"
+
+
+double poly_blep(double t, double dt){
+  // t = phase / Tablelength % 1;
+
+  // printf("%f\n", dt);
+  // 0 <= t < 1
+  if (t < dt) {
+    t /= dt;
+    return t+t - t*t - 1.0;
+  }
+  // -1 < t < 0
+  else if (t > 1.0 - dt) {
+    t = (t - 1.0) / dt;
+    return t*t + t+t + 1.0;
+  }
+  // 0 otherwise
+  else return 0.0;
+}
+
+void appendAudioObjToVector(AudioObject* ao, std::vector<double> * v){
+  const sample_t * audioBuffer = new sample_t[2*FRAMES_PER_BUFFER];
+
+  sample_t * buf = (sample_t *) audioBuffer;
+
+  for(int i=0; i<FRAMES_PER_BUFFER; i++){
+    *buf++ = 0;  // mono/left
+    *buf++ = 0;
+  }
+  buf = (sample_t*) audioBuffer;
+
+  ao->output(buf);
+
+  for(int i=0; i<FRAMES_PER_BUFFER; i++){
+    v->push_back(buf[2*i]);
+  }
+}
+
+void debug_plotter(){
+  using namespace matplot;
+  std::vector<double> x = linspace(0, FRAMES_PER_BUFFER, FRAMES_PER_BUFFER);
+  std::vector<double> y;
+  std::vector<double> y2;
+
+
+  
+  
+  Osc * osc = new Osc();
+  Osc * osc2 = new Osc();
+
+  osc->setFreq(880);
+  osc2->setFreq(880);
+  BiquadFilter * vcf = new BiquadFilter();
+  vcf->setFc(10000);
+
+  vcf->setInput(osc2);
+
+  appendAudioObjToVector(osc, &y);
+  // appendAudioObjToVector(osc, &y);
+  // appendAudioObjToVector(osc, &y);
+
+  appendAudioObjToVector(vcf, &y2);
+  // appendAudioObjToVector(vcf, &y2);
+  // appendAudioObjToVector(vcf, &y2);
+
+  plot(y);
+  hold(on);
+
+  plot(y2);
+  show();
+
+  
+}
+
+int main(int argc, char **argv) {
+  app(argc, argv);
+  // debug_plotter();
+  return 1;
 }

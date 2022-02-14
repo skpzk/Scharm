@@ -13,7 +13,7 @@ class Wave{
     Wave();
     sample_t wave[TABLE_SIZE];
   private:
-    sample_t maxValue = MAX/16;
+    sample_t maxValue = MAX;
     void sine();
     void tri();
     void square();

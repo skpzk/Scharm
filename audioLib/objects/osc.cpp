@@ -3,6 +3,8 @@
 #include "../utils/quantize.h"
 #include "../../state/state.h"
 
+#include <math.h>
+
 Osc::Osc() : 
 AudioObject()
 {
@@ -11,9 +13,12 @@ AudioObject()
   this->phase = 0;
   this->vco_or_sub = 0; // 0: vco
   wave = Wave(0);
+
+  lastOutput = 0;
 }
 
 void Osc::setWave(float type){
+  waveType = type;
   if(vco_or_sub == 0){
     wave = Wave(type);
   }else{
@@ -44,25 +49,131 @@ void Osc::output(void* outputBuffer){
   this->outputWave(outputBuffer);
 }
 
+double Osc::poly_blep(double t){
+  // t = phase / Tablelength % 1;
+
+  double dt = this->phaseIncrement / TABLE_SIZE;
+  // printf("%f\n", dt);
+  // 0 <= t < 1
+  if (t < dt) {
+    t /= dt;
+    return t+t - t*t - 1.0;
+  }
+  // -1 < t < 0
+  else if (t > 1.0 - dt) {
+    t = (t - 1.0) / dt;
+    return t*t + t+t + 1.0;
+  }
+  // 0 otherwise
+  else return 0.0;
+}
+
 void Osc::outputWave(void* outputBuffer){
   // printf("osc output\n");
   sample_t* out = (sample_t*) outputBuffer;
-  for(int i=0; i<FRAMES_PER_BUFFER; i++){
-    *out++ += this->wave.wave[(int)this->phase] * this->volume;  // mono/left
-    *out++ += this->wave.wave[(int)this->phase] * this->volume;  // right
-    this->phase += (this->phaseIncrement);
-    if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
+  double dPhaseIncrement;
+  // double maxTri = 0;
+  // double minTri = 0;
+  // double maxTri2 = 0;
+  // double minTri2 = 0;
+
+  switch(waveType){
+
+    case SAW:
+    // printf("here");
+      // maxTri = 0;
+      for(int i=0; i<FRAMES_PER_BUFFER; i++){
+        double value = this->wave.wave[(int)this->phase];
+        value -= MAX * poly_blep(this->phase / TABLE_SIZE);
+
+        // maxTri = (value>maxTri?value:maxTri);
+
+        *out++ += value * this->volume;  // mono/left
+        // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
+        // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
+        *out++ += value  * this->volume ;  // right
+        this->phase += (this->phaseIncrement);
+        if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
+      }
+      // printf("max Saw = %f\n", maxTri);
+      
+      break;
+
+    case SQR:
+    // printf("here");
+      // maxTri = 0;
+      for(int i=0; i<FRAMES_PER_BUFFER; i++){
+        double value = this->wave.wave[(int)this->phase];
+        value += MAX * poly_blep(this->phase / TABLE_SIZE);
+        value -= MAX * poly_blep(fmod(this->phase / TABLE_SIZE + 0.5, 1.));
+
+        // maxTri = (value>maxTri?value:maxTri);
+
+        *out++ += value * this->volume;  // mono/left
+        // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
+        // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
+        *out++ += value  * this->volume ;  // right
+        this->phase += (this->phaseIncrement);
+        if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
+      }
+      // printf("max Sqr = %f\n", maxTri);
+      
+      break;
+
+    case TRI:
+    // printf("here");
+      // maxTri = 0;
+      for(int i=0; i<FRAMES_PER_BUFFER; i++){
+        double value = this->wave.wave[(int)this->phase];
+
+        dPhaseIncrement = (double) this->phaseIncrement / TABLE_SIZE;
+
+        value += MAX * poly_blep(this->phase / TABLE_SIZE);
+        value -= MAX * poly_blep(fmod(this->phase / TABLE_SIZE + 0.5, 1.));
+
+        // Leaky integrator: y[n] = A * x[n] + (1 - A) * y[n-1]
+        value =  ( dPhaseIncrement * value + (1 - dPhaseIncrement) * lastOutput);
+        // maxTri2 = (value>maxTri2?value:maxTri2);
+        // minTri2 = (value<minTri2?value:minTri2);
+        
+        lastOutput = value;
+        value = value * 5;
+
+        // maxTri = (value>maxTri?value:maxTri);
+        // minTri = (value<minTri?value:minTri);
+
+        *out++ += value * this->volume;  // mono/left
+        // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
+        // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
+        *out++ += value  * this->volume ;  // right
+        this->phase += (this->phaseIncrement);
+        if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
+      }
+      // printf("max Tri = %f\n", maxTri);
+      // printf("min Tri = %f\n", minTri);
+      // printf("max Tri2= %f\n", maxTri2);
+      // printf("min Tri2= %f\n", minTri2);
+      break;
+
+    default:
+      for(int i=0; i<FRAMES_PER_BUFFER; i++){
+        *out++ += this->wave.wave[(int)this->phase] * this->volume;  // mono/left
+        *out++ += this->wave.wave[(int)this->phase] * this->volume;  // right
+        this->phase += (this->phaseIncrement);
+        if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
+      }
+      break;
   }
 }
 
-void Osc::CVOutput(void* outputBuffer){
-  printf("Getting data from AudioObject, something must be wrong\n");
-  printf("This method should be overridden by objects that inherit from AudioObject\n");
-  sample_t* out = (sample_t*) outputBuffer;
-  for(int i=0; i<FRAMES_PER_BUFFER; i++){
-      out[i] += SILENCE;
-  }
-}
+// void Osc::CVOutput(void* outputBuffer){
+//   printf("Getting data from AudioObject, something must be wrong\n");
+//   printf("This method should be overridden by objects that inherit from AudioObject\n");
+//   sample_t* out = (sample_t*) outputBuffer;
+//   for(int i=0; i<FRAMES_PER_BUFFER; i++){
+//       out[i] += SILENCE;
+//   }
+// }
 
 Vco::Vco() :
 Osc(){
