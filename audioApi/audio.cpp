@@ -15,24 +15,28 @@ int paCallback( const void *inputBuffer, void *outputBuffer,
 	paData *data = (paData*)userData;
 	sample_t *out = (sample_t*)outputBuffer;
 
-	data->counter *= -1;
+	// data->counter *= -1;
 
 	int finished = 0;
 	(void) inputBuffer; /* Prevent unused variable warnings. */
 
-	// if (data->audio != NULL) {
-	// 	data->audio->output(out);
-	// }
+	if (data->audio != NULL) {
+		data->audio->output(out);
+	}else{
+		for(int i=0; i<FRAMES_PER_BUFFER*2; i++){
+			*out++ = SILENCE;
+		}
+	}
 
 	// send silence
-	// for(int i=0; i<FRAMES_PER_BUFFER; i++){
-	// 	*out++ = 0;
-	// }
+	
+
+	// printf("paCallback()\n");
 
 	// send basic sqr wave
-	for(int i=0; i<FRAMES_PER_BUFFER; i++){
-		*out++ = (1<<30) * data->counter;
-	}
+	// for(int i=0; i<FRAMES_PER_BUFFER; i++){
+	// 	*out++ = (1<<30) * data->counter;
+	// }
 
 	// printf("%i\n", (1<<16) * data->counter);
 
@@ -58,6 +62,7 @@ int Audio::stop(){
 PaError Audio::startStream(void){
 		int i, totalSamps;
 
+		// printf("init pa :");
 		this->err = Pa_Initialize();
 		if( this->err != paNoError )
 		    return this->error();
@@ -71,6 +76,7 @@ PaError Audio::startStream(void){
 		this->outputParameters.sampleFormat = FORMAT;
 		this->outputParameters.suggestedLatency = Pa_GetDeviceInfo( this->outputParameters.device )->defaultLowOutputLatency;
 		this->outputParameters.hostApiSpecificStreamInfo = NULL;
+		// printf("before opening stream");
 		this->err = Pa_OpenStream( &this->stream,
 		                     NULL,      /* No input. */
 		                     &this->outputParameters,

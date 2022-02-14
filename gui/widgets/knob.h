@@ -43,7 +43,7 @@ public:
     // QString getText() const;
 
     void setText(string);
-
+    void setStateParamText(string);
     int sizeType;
     float fontsize1;
 

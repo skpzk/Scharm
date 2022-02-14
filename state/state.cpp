@@ -18,9 +18,11 @@ void State::read(){
 
     getConfigurationFromFile(State::autosavePath);
 
-    cout << "State is loaded, state = \n";
-    State::print();
-    cout << "loading done\n";
+    cout << "loaded\n" ;
+
+    // cout << "State is loaded, state = \n";
+    // State::print();
+    // cout << "loading done\n";
 
     
 }
@@ -45,7 +47,9 @@ void State::save(){
     writeConfigurationToFile(State::autosavePath);
 }
 
-StateDict::StateDict(){}
+StateDict::StateDict(){
+    nullParam = new Param("", 0);
+}
 
 void State::print(){
     params.print();
@@ -61,32 +65,24 @@ Param* StateDict::operator()(string name_){
         Param* p = findParam(name_);
         return p;
     }catch(const invalid_argument& e){
+        if(name_.empty()) return nullParam;
         setParam(name_, 0);
         Param* p = findParam(name_);
         return p;
     }
 }
 
-// Param * StateDict::operator()(string name_, float value_){
-//     // cout << "operator () called ";
-//     lowerWithoutSpaces(&name_);
-//     setParam(name_, value_);
-//     Param *param = findParam(name_);
-// }
-
-
-// Param *StateDict::testReturnParam(string name_){
-//     lowerWithoutSpaces(&name_);
-
-//     for(int i=0; i<params.size(); i++){
-//         if(params[i].getName() == name_){
-//             return &params[i];
-//         }
-//     }
-//     throw invalid_argument("Param name not found");
-//     // return Param("", -1);
-//     return nullptr;
-// }
+void StateDict::operator()(string name_, float value){
+    // cout << "operator () called ";
+    try{
+        Param* p = findParam(name_);
+        p->setValue(value);
+    }catch(const invalid_argument& e){
+        if(name_.empty()) return;
+        setParam(name_, value);
+        Param* p = findParam(name_);
+    }
+}
 
 int StateDict::size(){
     return params.size();
@@ -167,7 +163,7 @@ void Param::call(float v){
     }
 }
 
-void Param::setCallback(void* p_, function<void(void*, float)> f){
+void Param::attachCallback(void* p_, function<void(void*, float)> f){
     CallbackFunction cf;
     cf.callback = f;
     cf.p = p_;

@@ -14,8 +14,10 @@
 
 #include <iostream>
 
+#include <string>
 
-using namespace::std;
+
+
 
 class Radio : public QRadioButton
 {
@@ -36,6 +38,9 @@ class Radio : public QRadioButton
         static void computeSizeFromContainingWidgetSize(float, float, float*);
         QString text;
 
+        void setStateParam(QString);
+        void checkState();
+
     private:
         int ID;
 
@@ -45,9 +50,13 @@ class Radio : public QRadioButton
         // float padding;
         // QColor barsColor;
 
-
+        std::string stateKey;
+        // int stateValue;
 
         virtual void paintEvent(QPaintEvent*) override;
+    
+    public slots:
+        void warnState(int);
 };
 
 #endif // RADIO_H

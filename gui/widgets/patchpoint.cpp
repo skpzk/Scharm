@@ -65,13 +65,13 @@ QPointF Patchpoint::getCenter(){
 void Patchpoint::setPcToHoveredIfCursorOnPp(QMouseEvent * event){
 	if(distance(event->pos(), center) < mainRadius){
 		for(int i=0; i<pcs->pcs.size(); i++){
-			cout << "is hovered" << endl;
+			// cout << "is hovered" << endl;
 			pcs->pcs[i]->isHovered = true;
 			pcs->pcs[i]->repaint();
 		}
 	}else{
 		for(int i=0; i<pcs->pcs.size(); i++){
-			cout << "is not" << endl;
+			// cout << "is not" << endl;
 			// print("is not")
 			pcs->pcs[i]->isHovered = false;
 			pcs->pcs[i]->repaint();
@@ -96,10 +96,10 @@ void Patchpoint::leaveEvent(QEvent *ev){
 
 void Patchpoint::mousePressEvent(QMouseEvent *ev){
 // def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
-	cout << "mouse press   detected" << text_.toStdString() << endl;
+	// cout << "mouse press   detected" << text_.toStdString() << endl;
 
 	if((this->pcs->is_empty()) || (ev->modifiers() == Qt::ControlModifier)){
-		cout << "Pb crate pc\n";
+		// cout << "Pb crate pc\n";
 
 		Patchbay *parent = (Patchbay*) this->parent();
 		parent->createPC(this);

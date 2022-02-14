@@ -48,6 +48,12 @@ void Knob::setText(string text){
     stateKey = text_.toStdString();
     lowerWithoutSpaces(&stateKey);
 }
+
+void Knob::setStateParamText(string text){
+    stateKey = text;
+    lowerWithoutSpaces(&stateKey);
+    checkState();
+}
 // void Knob::mousePressEvent(QMouseEvent *ev){
 
 // }
@@ -55,18 +61,18 @@ void Knob::setText(string text){
 void Knob::warnState(int _){
     // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
     // # print("value = ", self.value())
-    cout << "warning state :\n";
-    cout << "key = " << stateKey << ", value = " << (float) value() / maximum() << endl;
-    State::params(stateKey)->setValue((float) value() / maximum());
+    // cout << "warning state :\n";
+    // cout << "key = " << stateKey << ", value = " << (float) value() / maximum() << endl;
+    State::params(stateKey)->setValue((float) value());
 }
 
 void Knob::checkState(){
     // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
     // # print("value = ", self.value())
-    cout << "checking state :\n";
-    cout << "key = " << stateKey << ", value = " << (float) *State::params(stateKey) << endl;
+    // cout << "checking state :\n";
+    // cout << "key = " << stateKey << ", value = " << (float) *State::params(stateKey) << endl;
     // State::params(stateKey)->setValue(value() / maximum());
-    setValue(*State::params(stateKey) * maximum());
+    setValue(*State::params(stateKey));
 }
 
 void Knob::setRingColor(QColor color){

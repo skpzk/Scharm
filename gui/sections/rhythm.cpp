@@ -17,7 +17,7 @@ QWidget *createRhythmSection(Window* parent){
 		// knob = Knob.Knob(3, titles[i])
 		// QDial *knob = new QDial;
 		Knob *knob = new Knob;
-		knob->setText("Step" + to_string(i+1));
+		knob->setText("Clk" + to_string(i+1));
 		knob->setStyleSheet(
 			defaultKnobStyleSheet(rhythm));
         knob->setMinimum(1);

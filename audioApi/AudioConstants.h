@@ -5,6 +5,7 @@
 #define TABLE_SIZE          (3200)
 #define MAX_TABLE_NUM       (4)
 #define FRAMES_PER_BUFFER   (512)
+#define CHANNELS            (2)
 #define VOICES              (16)
 
 #define FORMAT      paInt32
@@ -16,5 +17,6 @@ typedef int   sample_t;
 #define SAW      (1)
 #define TRIANGLE (2)
 #define SQUARE   (3)
+
 
 #endif

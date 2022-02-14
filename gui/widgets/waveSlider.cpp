@@ -7,8 +7,13 @@
 #include <QVector>
 
 #include "../utils.h"
+// #include "../utils.h"
+#include "../../utils/utils.h"
+#include "../../state/state.h"
 
 #include <cmath>
+
+using namespace::std;
 
 
 QPainterPath compute_tri_path(float x0, float y0, float width, float height){
@@ -103,6 +108,31 @@ WaveSlider::WaveSlider(int nb_items, int dir): QSlider(nullptr){
 	// self.valueChanged.connect(self.warnState)
 
 	setValue(0);
+
+    connect(this, &QSlider::valueChanged, this, &WaveSlider::warnState);
+}
+
+void WaveSlider::setStateParamText(string text){
+    stateKey = text;
+    lowerWithoutSpaces(&stateKey);
+    checkState();
+}
+
+void WaveSlider::warnState(int _){
+    // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
+    // # print("value = ", self.value())
+    // cout << "warning state :\n";
+    // cout << "key = " << stateKey << ", value = " << (float) value() / maximum() << endl;
+    State::params(stateKey)->setValue((float) value());
+}
+
+void WaveSlider::checkState(){
+    // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
+    // # print("value = ", self.value())
+    // cout << "checking state :\n";
+    // cout << "key = " << stateKey << ", value = " << (float) *State::params(stateKey) << endl;
+    // State::params(stateKey)->setValue(value() / maximum());
+    setValue(*State::params(stateKey));
 }
 
 int WaveSlider::getMousePositionInSteps(QPoint mousePos){

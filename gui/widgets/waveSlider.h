@@ -12,7 +12,7 @@
 
 #include <QMouseEvent>
 
-using namespace::std;
+// using namespace::std;
 
 QPainterPath compute_tri_path(float x0, float y0, float width, float height);
 QPainterPath compute_saw_path(float x0, float y0, float width, float height);
@@ -34,6 +34,9 @@ public:
 
     WaveSlider(int nb_items, int direction);
 
+    void setStateParamText(std::string);
+    void checkState();
+
 private:
 
     virtual void paintEvent(QPaintEvent*) override;
@@ -44,10 +47,15 @@ private:
 
     int getMousePositionInSteps(QPoint);
 
+    std::string stateKey;
+
 protected:
     void mousePressEvent(QMouseEvent *ev) override;
     void mouseMoveEvent(QMouseEvent *ev) override;
     void mouseReleaseEvent(QMouseEvent *ev) override;
+
+public slots:
+    void warnState(int);
 
 };
 

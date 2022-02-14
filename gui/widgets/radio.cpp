@@ -6,6 +6,10 @@
 #include <QList>
 #include <QLabel>
 
+#include "../../state/state.h"
+
+using namespace std;
+
 vector<QString> colors = {
     "#38e643",
     "#1e62ff",
@@ -32,6 +36,8 @@ QRadioButton(nullptr), text(text)
 
     paintSize = 0;
     fontsize = 0;
+
+    connect(this, &QRadioButton::toggled, this, &Radio::warnState);
     
 }
 
@@ -43,6 +49,24 @@ void Radio::computeSize(){
 void Radio::computeSizeFromContainingWidgetSize(float w, float h, float* out){
     out[0] = min(1./8. * w, h/4.);
     out[1] = out[0] * fontsizefactor;
+}
+
+void Radio::setStateParam(QString text){
+    stateKey = text.toStdString();
+}
+
+void Radio::warnState(int _){
+    // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
+    // # print("value = ", self.value())
+    // cout << "warning state :\n";
+    // cout << "key = " << stateKey << ", value = " << (float) value() / maximum() << endl;
+    State::params(stateKey)->setValue((int) ID);
+}
+
+void Radio::checkState(){
+    if(*State::params(stateKey) == ID){
+        setChecked(true);
+    }
 }
 
 void Radio::paintEvent(QPaintEvent*){

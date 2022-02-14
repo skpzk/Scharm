@@ -22,33 +22,38 @@ QHBoxLayout *firstLine(){
 }
 
 QHBoxLayout *secondLine(int *stretches){
-    QHBoxLayout *hbox = new QHBoxLayout;
+	QHBoxLayout *hbox = new QHBoxLayout;
 
 	layoutConf(hbox);
 
-    WaveSlider *ws1 = new WaveSlider(5, 0);
-    WaveSlider *ws2 = new WaveSlider(5, 1);
+	WaveSlider *ws1 = new WaveSlider(5, 0);
+	WaveSlider *ws2 = new WaveSlider(5, 1);
+
+	ws1->setStateParamText("vco1Wave");
+	ws2->setStateParamText("vco2Wave");
 
 	hbox->addWidget(ws1);
+	ws1->checkState();
 
-    Knob *knob0 = new Knob;
-    knob0->setText("Vco1");
-    knob0->setStyleSheet(defaultKnobStyleSheet(vco1));
+	Knob *knob0 = new Knob;
+	knob0->setText("Vco1");
+	knob0->setStyleSheet(defaultKnobStyleSheet(vco1));
+	knob0->setStateParamText("Vco1knobfreq");
 
-    hbox->addWidget(knob0);
+	hbox->addWidget(knob0);
 
-    // range radio
+	// range radio
 
-    QVBoxLayout *vboxrange = new QVBoxLayout;
+	QVBoxLayout *vboxrange = new QVBoxLayout;
 	layoutConf(vboxrange);
 
-    int ranges[] = {5, 2, 1};
-    vboxrange->addStretch(1);
+	int ranges[] = {5, 2, 1};
+	vboxrange->addStretch(1);
 
-    QWidget *rangeGroup = new QWidget;
+	QWidget *rangeGroup = new QWidget;
 	rangeGroup->setContentsMargins(0, 0, 0, 0);
 
-    for(int i=0; i<3; i++){
+	for(int i=0; i<3; i++){
 		Radio *rangeRadio = new Radio(QString::fromStdString("±" + to_string(ranges[i])), i);
 		
 		// rangeRadio->setStateParam('rangeradio');
@@ -58,7 +63,7 @@ QHBoxLayout *secondLine(int *stretches){
 		vboxrange->addWidget(rangeRadio);
 		// rangeGroup.addButton(rangeRadio)
 		vboxrange->setStretch(i +1, 1);
-    }
+	}
 	// rangeRadio.setChecked(True)
 
 	QLabel *label = new QLabel("Range");
@@ -72,38 +77,46 @@ QHBoxLayout *secondLine(int *stretches){
 	hbox->addWidget(rangeGroup);
 
 
-    Knob *knob1 = new Knob;
-    knob1->setText("Vco2");
-    knob1->setStyleSheet(defaultKnobStyleSheet(vco2));
+	Knob *knob1 = new Knob;
+	knob1->setText("Vco2");
+	knob1->setStyleSheet(defaultKnobStyleSheet(vco2));
 
-    hbox->addWidget(knob1);
+	knob1->setStateParamText("Vco2knobfreq");
+
+	hbox->addWidget(knob1);
 
 	hbox->addWidget(ws2);
+	ws2->checkState();
 
-    for(int i=0; i<5; i++){
-        hbox->setStretch(i, stretches[i]);
-    }
+	for(int i=0; i<5; i++){
+		hbox->setStretch(i, stretches[i]);
+	}
 
-    return hbox;
+	return hbox;
 }
 
 QHBoxLayout *thirdLine(){
-    QHBoxLayout *hbox = new QHBoxLayout;
+	QHBoxLayout *hbox = new QHBoxLayout;
 
 	layoutConf(hbox);
 
-    string titles[] = {"Sub1", "Sub2"};
-    knobType kt[] = {vco1, vco2};
+	string titles[] = {"Sub1", "Sub2"};
+	knobType kt[] = {vco1, vco2};
 
-    for(int i=0; i < 4; i++){
+	string stateKeys[] = {"vco1 sub1 div", "vco1 sub2 div", "vco2 sub1 div", "vco2 sub2 div"};
+
+	for(int i=0; i < 4; i++){
 		// knob = Knob.Knob(3, titles[i])
 		// QDial *knob = new QDial;
 		Knob *knob = new Knob;
 		knob->setText(titles[i%2]);
 		knob->setStyleSheet(
 			defaultKnobStyleSheet(kt[i/2]));
-        knob->setMinimum(1);
-        knob->setMaximum(16);
+		knob->setMinimum(1);
+		knob->setMaximum(16);
+
+		knob->setStateParamText(stateKeys[i]);
+		knob->checkState();
 
 		// knob.setStyleSheet(knobDefaultStyleSheet('general'))
 		// knob.checkState()
@@ -116,7 +129,7 @@ QHBoxLayout *thirdLine(){
 	hbox->setContentsMargins(0, 0, 0, 0);
 	hbox->setSpacing(0);
 
-    return hbox;
+	return hbox;
 
 }
 
@@ -188,6 +201,8 @@ QHBoxLayout *sixthLine(int *stretches){
     knob0->setText("Vco1 level");
     knob0->setStyleSheet(defaultKnobStyleSheet(vco1));
 
+		knob0->checkState();
+
     hbox->addWidget(knob0);
 
     // quant radio
@@ -197,23 +212,23 @@ QHBoxLayout *sixthLine(int *stretches){
 
     
 	string quantizes[] = {"12-ET", "8-ET", "12-JI", "8-JI"};
-    vboxquant->addStretch(1);
+	vboxquant->addStretch(1);
 
-    QWidget *quantGroup = new QWidget;
+	QWidget *quantGroup = new QWidget;
 	quantGroup->setContentsMargins(0, 0, 0, 0);
 	quantGroup->setObjectName("quantizeGroup");
 
-    for(int i=0; i<4; i++){
+	for(int i=0; i<4; i++){
 		Radio *quantRadio = new Radio(QString::fromStdString(quantizes[i]), i);
 		
-		// quantRadio->setStateParam('quantradio');
+		quantRadio->setStateParam("quantradio");
 		// quantRadio->stateValue = "r" + str(ranges[i]);
-		// quantRadio->checkState();
+		quantRadio->checkState();
 
 		vboxquant->addWidget(quantRadio);
 		// quantGroup.addButton(quantRadio)
 		vboxquant->setStretch(i + 1, 1);
-    }
+	}
 	// quantRadio->setChecked(true);
 
 	QLabel *label = new QLabel("Quantize");
@@ -227,34 +242,40 @@ QHBoxLayout *sixthLine(int *stretches){
 	hbox->addWidget(quantGroup);
 
 
-    Knob *knob1 = new Knob;
-    knob1->setText("Vco2 level");
-    knob1->setStyleSheet(defaultKnobStyleSheet(vco2));
+	Knob *knob1 = new Knob;
+	knob1->setText("Vco2 level");
+	knob1->setStyleSheet(defaultKnobStyleSheet(vco2));
 
-    hbox->addWidget(knob1);
+	knob1->checkState();
+
+	hbox->addWidget(knob1);
 
 	hbox->addStretch(1);
 
-    for(int i=0; i<5; i++){
-        hbox->setStretch(i, stretches[i]);
-    }
+	for(int i=0; i<5; i++){
+		hbox->setStretch(i, stretches[i]);
+	}
 
-    return hbox;
+	return hbox;
 }
 
 QHBoxLayout *seventhLine(){
-    QHBoxLayout *hbox = new QHBoxLayout;
+	QHBoxLayout *hbox = new QHBoxLayout;
 
 	layoutConf(hbox);
 
-    string titles[] = {"Sub1 level", "Sub2 level"};
-    knobType kt[] = {vco1, vco2};
+	string titles[] = {"Sub1 level", "Sub2 level"};
+	string stateKeys[] = {"vco1 sub1 level", "vco1 sub2 level", "vco2 sub1 level", "vco2 sub2 level"};
+	knobType kt[] = {vco1, vco2};
 
-    for(int i=0; i < 4; i++){
-		Knob *knob = new Knob;
-		knob->setText(titles[i%2]);
-		knob->setStyleSheet(
-			defaultKnobStyleSheet(kt[i/2]));
+	for(int i=0; i < 4; i++){
+	Knob *knob = new Knob;
+	knob->setText(titles[i%2]);
+	knob->setStyleSheet(
+		defaultKnobStyleSheet(kt[i/2]));
+
+		knob->setStateParamText(stateKeys[i]);
+		knob->checkState();
 
 		// knob.checkState()
 		// if titles[i] == "Tempo":
@@ -266,7 +287,7 @@ QHBoxLayout *seventhLine(){
 	hbox->setContentsMargins(0, 0, 0, 0);
 	hbox->setSpacing(0);
 
-    return hbox;
+	return hbox;
 
 }
 

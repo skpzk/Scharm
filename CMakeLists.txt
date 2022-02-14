@@ -15,20 +15,19 @@ set(SOURCES
 
     utils/utils.cpp         utils/utils.h
     utils/fileio.cpp        utils/fileio.h
-    utils/logger.cpp        utils/logger.h
 
     gui/window.cpp          gui/window.h 
     gui/utils.cpp           gui/utils.h
     gui/defs.cpp            gui/defs.h
 
-    gui/sections/section.cpp    gui/sections/section.h
-    gui/sections/filter.cpp     gui/sections/filter.h
-    gui/sections/general.cpp    gui/sections/general.h
-    gui/sections/env.cpp        gui/sections/env.h
-    gui/sections/transport.cpp  gui/sections/transport.h
-    gui/sections/sequencer.cpp  gui/sections/sequencer.h
-    gui/sections/rhythm.cpp     gui/sections/rhythm.h
-    gui/sections/vcos.cpp       gui/sections/vcos.h
+    gui/sections/section.cpp        gui/sections/section.h
+    gui/sections/filter.cpp         gui/sections/filter.h
+    gui/sections/general.cpp        gui/sections/general.h
+    gui/sections/env.cpp            gui/sections/env.h
+    gui/sections/transport.cpp      gui/sections/transport.h
+    gui/sections/sequencer.cpp      gui/sections/sequencer.h
+    gui/sections/rhythm.cpp         gui/sections/rhythm.h
+    gui/sections/vcos.cpp           gui/sections/vcos.h
     gui/sections/patchbay.cpp       gui/sections/patchbay.h
 
     gui/widgets/sectionLabel.cpp    gui/widgets/sectionLabel.h
@@ -42,10 +41,18 @@ set(SOURCES
 
     state/state.cpp     state/state.h
 
-    audioApi/audio.cpp      audioApi/audio.h
+    audioApi/audio.cpp                  audioApi/audio.h
 
-    audioLib/audioObject.cpp    audioLib/audioObject.h
-    audioLib/osc.cpp            audioLib/osc.h
+    audioLib/patch.cpp                  audioLib/patch.h
+
+    audioLib/objects/audioObject.cpp    audioLib/objects/audioObject.h
+    audioLib/objects/osc.cpp            audioLib/objects/osc.h
+    audioLib/objects/Wave.cpp           audioLib/objects/Wave.h
+    audioLib/objects/mixer.cpp          audioLib/objects/mixer.h
+
+    audioLib/utils/SignalUtils.cpp      audioLib/utils/SignalUtils.h
+    audioLib/utils/midi.cpp             audioLib/utils/midi.h
+    audioLib/utils/quantize.cpp         audioLib/utils/quantize.h
 )
 
 
@@ -65,6 +72,7 @@ if (UNIX)
         jack
         rt
         m
+        dl
         )
 endif (UNIX)
 

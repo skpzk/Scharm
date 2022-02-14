@@ -7,11 +7,10 @@
 #include <math.h>
 #include "portaudio.h"
 
-#include "../audioLib/audioObject.h"
+#include "../audioLib/objects/audioObject.h"
 
 typedef struct {
 	AudioObject* audio = NULL;
-	int counter = 1;
 }paData;
 
 int patestCallback( const void *inputBuffer, void *outputBuffer,

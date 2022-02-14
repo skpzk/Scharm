@@ -1,6 +1,11 @@
 #include "logger.h"
 #include <iostream>
 
+#include "colors.h"
+
+#define BOOST_STACKTRACE_USE_ADDR2LINE
+#include <boost/stacktrace.hpp>
+
 /*
 default format :
 (yellow or blue) [date] (color for level) [log level] (white) ([file:method, line]) : msg
@@ -14,7 +19,7 @@ const string CurrentDateTime()
   tm  tstruct;
   char       buf[80];
   localtime_r(&now, &tstruct);
-  strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+  strftime(buf, sizeof(buf), "%Y-%m-%d %X ", &tstruct);
   return buf;
 }
 
@@ -46,7 +51,11 @@ void Logger::test(){
 }
 
 void Logger::info(std::string msg){
-  cout<<CurrentDateTime()<<msg<<endl;
+  char green[] = "\033[32m";
+  cout << colors.yellow << CurrentDateTime() 
+  << colors.green << "info " 
+  << "(" << boost::stacktrace::stacktrace() << ") "
+  << colors.reset << msg << endl;
 }
 
 void Logger::info(const char* msg){
