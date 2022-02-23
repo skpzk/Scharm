@@ -53,7 +53,70 @@ class BiquadFilter : public AudioObject{
   protected:
     void filter(void*);
 };
-class Vcf : public BiquadFilter{
+
+class MFilter : public AudioObject{
+  public:
+    void output(void*);
+
+    void setFc(float);
+    void setMidiFc(float);
+
+    // lpf
+    void setQ(float);
+    void setMidiQ(float);
+
+    // void setFilterType(FilterType);
+    MFilter();
+
+    void setInput(AudioObject*);
+  private:
+    double fc, maxFc, T;
+    double Q;
+
+    double gamma[4];
+    double s[4];
+    double y[4] = {0, 0, 0, 0};
+    double G, K, alpha0, a0;
+
+    void computeCoefs();
+
+    void updateQ(); //lpf
+
+    AudioObject* input;
+  
+  protected:
+    void filter(void*);
+};
+
+class O1Filter : public AudioObject{
+  public:
+    void output(void*);
+
+    void setFc(float);
+
+    // lpf
+    void setQ(float);
+
+    // void setFilterType(FilterType);
+    O1Filter();
+
+    void setInput(AudioObject*);
+  private:
+    double fc, maxFc, T;
+
+
+    double a0, y0=0;
+    
+
+    void computeCoefs();
+
+    AudioObject* input;
+  
+  protected:
+    void filter(void*);
+};
+
+class Vcf : public O1Filter{
   public:
     Vcf();
     void output(void*);

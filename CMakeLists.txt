@@ -14,6 +14,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SOURCES
     scharm.cpp              scharm.h
 
+    design/filter.cpp       design/filter.h
+
     utils/utils.cpp         utils/utils.h
     utils/fileio.cpp        utils/fileio.h
 
@@ -55,6 +57,7 @@ set(SOURCES
     audioLib/utils/SignalUtils.cpp      audioLib/utils/SignalUtils.h
     audioLib/utils/midi.cpp             audioLib/utils/midi.h
     audioLib/utils/quantize.cpp         audioLib/utils/quantize.h
+    # audioLib/utils/fft.cpp              audioLib/utils/fft.h
 )
 
 
@@ -85,6 +88,7 @@ if (UNIX)
         m
         dl
         Matplot++::matplot
+        fftw3 # fft lib
         )
 endif (UNIX)
 
