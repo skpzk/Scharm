@@ -8,9 +8,11 @@
 #include "portaudio.h"
 
 #include "../audioLib/objects/audioObject.h"
+#include "../audioLib/objects/clock.h"
 
 typedef struct {
 	AudioObject* audio = NULL;
+	AudioObject* clock = NULL;
 }paData;
 
 int patestCallback( const void *inputBuffer, void *outputBuffer,
@@ -22,11 +24,13 @@ int patestCallback( const void *inputBuffer, void *outputBuffer,
 
 class Audio{
 	public:
+		Audio();
 		int start();
 		int stop();
 
 		paData        data;
 		void setInput(AudioObject*);
+		void setClock(AudioObject*);
 	private:
 		PaStream*           stream;
 		PaStreamParameters  outputParameters;

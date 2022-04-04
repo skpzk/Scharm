@@ -70,12 +70,14 @@ Scharm::Scharm(){
 
     this->audio = new Audio;
     this->audio->setInput(patch);
+    this->audio->setClock(patch);
 
     this->audio->start();
 
 }
 
 void Scharm::close(){
+    this->audio->stop();
     cout << "closing Scharm class \n";
     State::save();
 }

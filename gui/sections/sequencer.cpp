@@ -1,6 +1,7 @@
 #include "sequencer.h"
 
 #include "../defs.h"
+#include "../../../state/state.h"
 #include <string>
 
 
@@ -15,14 +16,17 @@ QWidget *createSequencerSection(Window* parent, int seqNumber){
 		// QDial *knob = new QDial;
 		Knob *knob = new Knob;
 		knob->setText("Step" + to_string(i+1));
-		knob->setStyleSheet(
-			defaultKnobStyleSheet(seq));
-        knob->setMinimum(-127);
+		knob->setKnobType(seq);
+		knob->setId(i+1);
 
 		// knob.setStyleSheet(knobDefaultStyleSheet('general'))
-		// knob.checkState()
+		knob->setMinimum(-127);
 		// if titles[i] == "Tempo":
+		knob->checkState();
+		knob->setStateParamText("seq" + to_string(seqNumber) + "step" + to_string(i+1));
 		// State.params.setCallback("activetempo", knob.sequencerCallback)
+
+		State::params("activeseq" + to_string(seqNumber) + "step")->attachCallback((void*) knob, Knob::changeTitleColorCallback);
 
 		hbox->addWidget(knob);
 	}

@@ -10,9 +10,11 @@ class Patch: public AudioObject{
     Patch();
 
     void output(void*);
+    void update();
 
   private:
     AudioObject* outputObj;
+    AudioObject* masterClock;
 };
 
 #endif /* AUDIOLIB_PATCH_H */

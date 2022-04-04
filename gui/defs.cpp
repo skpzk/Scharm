@@ -7,7 +7,7 @@ Theme::Theme(){
     // darkTheme = false;
     if(darkTheme){
         backgroundColor = "#111111";
-        buttonBackground = "#919191";
+        buttonBackground = "#111111";
         // buttonBackground = "red";
         pointColor = "white";
         barsColor = "#aaaaaa";
@@ -67,12 +67,12 @@ QString buttonDefaultStyleSheet(){
 		"Button{"
 			"background-color: buttonBackground;"
 			"border: 1px solid #aaa;"
-			"color: black;"
+			"color: white;"
 		"}"
 		"Button::Checked{"
-			"background-color: black;"
+			"background-color: #d4d4d4;"
 			"border: 0px;"
-			"color: white;"
+			"color: black;"
 		"}"
 		"Button::Pressed{"
 			"background-color: #343434;"

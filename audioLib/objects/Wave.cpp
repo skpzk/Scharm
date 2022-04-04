@@ -30,10 +30,43 @@ Wave::Wave(int type) {
     }
 }
 
+Wave::Wave(int type, sample_t maxV) {
+    this->maxValue = maxV;
+    switch (type) {
+    case 0: //sine wave
+        this->sine();
+        break;
+
+    case 1: //tri wave : created with a sqr wave, integrated by the oscillator
+        this->square();
+        break;
+
+    case 2: //saw wave
+        this->saw();
+        break;
+
+    case 3: //this is used by the main VCO, but not the subs, 
+        this->square();
+        break;
+
+    case 4: //square wave
+        this->square();
+        break;
+
+    case -1: //custom wave
+        initBuffer(wave, FRAMES_PER_BUFFER, 0);
+        break;
+    }
+}
+
 Wave::Wave()
 {
     this->sine();
 }
+
+// void Wave::setMaxValue(sample_t newValue){
+//     maxValue = newValue;
+// }
 
 void Wave::sine(){
   for(int i=0; i<TABLE_SIZE; i++ )

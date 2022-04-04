@@ -29,13 +29,17 @@ void State::read(){
 
 void State::createAutosavepath(){
 
-    //this works if the sharm executable is located in SHARM_ROOT/build
+    //this works if the sharm executable is located in SHARM_ROOT/**
 
     fs::path tmpcwd = fs::current_path();
 
     cout << "CurrentPath = " << tmpcwd << endl;
 
-    State::configDir = tmpcwd.parent_path()/"state"; 
+    while(tmpcwd.filename() != "Scharm"){
+        tmpcwd = tmpcwd.parent_path();
+    }
+
+    State::configDir = tmpcwd/"state"; 
     State::autosavePath = State::configDir/"state.sharm";
 }
 
@@ -132,6 +136,7 @@ Param::Param(string name_, float value_){
     
     name = name_;
     value = value_;
+    call(value);
 }
 
 Param::Param(string name_){
@@ -143,6 +148,7 @@ Param::Param(string name_){
 
 void Param::setValue(float value_){
     value = value_;
+    call(value);
 }
 
 float Param::getValue(){

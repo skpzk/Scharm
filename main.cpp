@@ -1,13 +1,5 @@
 #include <stdio.h>
 
-#include <QApplication>
-#include <QMainWindow>
-#include <QSize>
-
-#include "gui/window.h"
-#include "scharm.h"
-
-
 /*
 Last thing I was doing :
   audioLib: 
@@ -20,7 +12,6 @@ Last thing I was doing :
   + adding sub oscs
     todo: change behaviour of quantize ET to mimic that of quantize JI
   + adding a filter
-  - characterize the filter : what order ?
   - integrate a moog filter, based on the pdf, see filter.cpp
 
 Interface :
@@ -69,6 +60,8 @@ BUGS :
         what():  std::bad_alloc
       Aborted (core dumped)
     No idea why.
+    It may have been because I wasn't stopping the audio before. This is now done by the Scharm instance.
+
 
   - When two osc (typically two subs) have the same frequency, they can have opposite phases, thus cancelling each other
     maybe I could find a way to synchronize their phases on some special conditions, 
@@ -84,7 +77,16 @@ Improvement ideas:
 */
 
 // for sleep function :
-#include <unistd.h>
+// #include <unistd.h>
+
+#include <QApplication>
+#include <QMainWindow>
+#include <QSize>
+
+
+
+#include "gui/window.h"
+#include "scharm.h"
 
 int app(int argc, char **argv){
   printf("Hello\n");
@@ -106,10 +108,16 @@ int app(int argc, char **argv){
   return 1;
 }
 
-#include "design/filter.h"
+// #include "design/filter.h"
+
+
+
+
 
 int main(int argc, char **argv) {
   app(argc, argv);
   // debug_plotter_spectrum();
+  
+  
   return 1;
 }

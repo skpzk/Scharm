@@ -6,6 +6,7 @@
 
 #include "../defs.h"
 #include "../../utils/utils.h"
+#include "../../state/state.h"
 #include <string>
 
 Button::Button(QWidget * parent,
@@ -16,10 +17,37 @@ QAbstractButton(parent),
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     // setSizePolicy(Qtw.QSizePolicy.Ignored, Qtw.QSizePolicy.Ignored);
     setMinimumHeight(10);
+    connect(this, &QAbstractButton::toggled, this, &Button::warnState);
+
 }
 
 void Button::setText(string text){
     text_ = QString::fromStdString(text);
+    stateKey = text;
+    lowerWithoutSpaces(&stateKey);
+}
+
+void Button::setStateParamText(string text){
+    stateKey = text;
+    lowerWithoutSpaces(&stateKey);
+    checkState();
+}
+
+void Button::warnState(int _){
+    // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
+    // # print("value = ", self.value())
+    // cout << "warning state :\n";
+    // cout << "key = " << stateKey << ", value = " << (float) value() / maximum() << endl;
+    State::params(stateKey)->setValue((float) isChecked());
+}
+
+void Button::checkState(){
+    // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
+    // # print("value = ", self.value())
+    // cout << "checking state :\n";
+    // cout << "key = " << stateKey << ", value = " << (float) *State::params(stateKey) << endl;
+    // State::params(stateKey)->setValue(value() / maximum());
+    setChecked(*State::params(stateKey));
 }
 
 void Button::getColorFromStyleSheet(){

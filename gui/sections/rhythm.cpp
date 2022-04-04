@@ -2,9 +2,12 @@
 
 #include "../defs.h"
 #include "../widgets/button.h"
+#include "../../state/state.h"
 #include <string>
 
 #include <QLabel>
+
+#include <iostream>
 
 
 QWidget *createRhythmSection(Window* parent){
@@ -16,17 +19,25 @@ QWidget *createRhythmSection(Window* parent){
 	for(int i=0; i < 4; i++){
 		// knob = Knob.Knob(3, titles[i])
 		// QDial *knob = new QDial;
+		// std::cout << "state::clk" << i+1 << " = " << *State::params("clk" + to_string(i+1)) << std::endl;
 		Knob *knob = new Knob;
 		knob->setText("Clk" + to_string(i+1));
-		knob->setStyleSheet(
-			defaultKnobStyleSheet(rhythm));
-        knob->setMinimum(1);
-        knob->setMaximum(16);
+		knob->setKnobType(rhythm);
+		
 
 		// knob.setStyleSheet(knobDefaultStyleSheet('general'))
 		// knob.checkState()
+		// std::cout << "state::clk" << i+1 << " = " << *State::params("clk" + to_string(i+1)) << std::endl;
+		// std::cout << "checking state\n";
+		knob->checkState();
+		// std::cout << "state::clk" << i+1 << " = " << *State::params("clk" + to_string(i+1)) << std::endl;
 		// if titles[i] == "Tempo":
 		// State.params.setCallback("activetempo", knob.sequencerCallback)
+		knob->setMinimum(1);
+		knob->setMaximum(16);
+		// std::cout << "callback key for clock " << i+1 << " activerhythm" + to_string(i+1) << std::endl;
+
+		State::params("activerhythm" + to_string(i+1))->attachCallback((void*) knob, Knob::changeTitleColorCallback);
 
 		hbox->addWidget(knob);
 	}
@@ -48,8 +59,8 @@ QWidget *createRhythmSection(Window* parent){
         button->setCheckable(true);
         
 
-        // button.setStateParam(stateParam);
-        // button.checkState();
+        button->setStateParamText("seq" + to_string(i/4 + 1) + "clk" + to_string(i%4 + 1));
+        // button->checkState();
 
         grid->addWidget(button, i/4, i%4);
     }

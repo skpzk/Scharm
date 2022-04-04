@@ -6,6 +6,7 @@
 #include <QPointF>
 #include <string>
 #include <iostream>
+#include "../defs.h"
 
 using namespace::std;
 
@@ -49,6 +50,14 @@ public:
 
     void checkState();
 
+    static void changeTitleColorCallback(void*, float);
+
+    void setMinimum(int);
+    void setMaximum(int);
+
+    void setKnobType(knobType);
+    void setId(int);
+
 private:
 
     virtual void paintEvent(QPaintEvent*) override;
@@ -72,11 +81,28 @@ private:
 
     bool debug_print_rects;
 
+    float extent, offset;
+
+    bool ignoresMouse = true;
+
+    void connectWarnState();
+    void disconnectWarnState();
+
+    knobType kType;
+    int id;
+
 public slots:
     void warnState(int);
+    void repaintSlot();
+
+signals:
+    void repaintTitle();
     
 protected:
-    // void mousePressEvent(QMouseEvent *ev) override;
+    void mousePressEvent(QMouseEvent *ev) override;
+    void mouseMoveEvent(QMouseEvent *ev) override;
+    void mouseReleaseEvent(QMouseEvent *ev) override;
+    void mouseEvent(QMouseEvent *ev);
 
 };
 

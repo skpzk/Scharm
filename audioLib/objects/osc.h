@@ -1,5 +1,5 @@
-#ifndef OSC_H_
-#define OSC_H_
+#ifndef OBJECTS_OSC_H
+#define OBJECTS_OSC_H
 
 #include <iostream>
 #include <cmath>
@@ -23,6 +23,9 @@ class Osc : public AudioObject{
 		StateKeys stateKeys;
 		double poly_blep(double t);
 
+		// void setLocalMaxToOne();
+		// void resetLocalMax();
+
 	private:
 		// Wavetables sample_t
 		Wave wave;
@@ -30,17 +33,26 @@ class Osc : public AudioObject{
 		float phase;
 
 		float lastOutput;
+		// sample_t localMax = MAX;
+
+		float freqArray[FRAMES_PER_BUFFER];
+		
 
 
 	protected:
 		int vco_or_sub;// 0 is for vco, 1 is for sub
 		float freq;
+
 		float volume;
 
 		int waveType;
 
 		void updatePhaseIncrement();
 		void outputWave(void*);
+
+		virtual void updateFreq(int);
+
+		sample_t sequence[2*FRAMES_PER_BUFFER];
 
 };
 
@@ -52,14 +64,21 @@ class Vco : public Osc{
 		int getWave();
 		float getFreq();
 
+		void setSequencer(AudioObject*);
+
 	private:
 		void checkValues();
 
 		// gui values :
 		float knobFreq = 0;
 		int quantValue;
+		int range;
+		bool seqActive;
 		
 		void updateFreq();
+		virtual void updateFreq(int );
+
+		AudioObject * seq;
 
 	protected:
 		void updateWaveType(int);
@@ -79,7 +98,8 @@ class Sub : public Vco{
 		float div;
 
 		void computeDiv();
+		void updateFreq(int );
 		Vco * vco;
 };
 
-#endif // OSC_H_
+#endif /* OBJECTS_OSC_H */

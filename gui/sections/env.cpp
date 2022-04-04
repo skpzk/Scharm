@@ -15,8 +15,9 @@ QWidget *createEnvSection(Window* parent){
 		// QDial *knob = new QDial;
 		Knob *knob = new Knob;
 		knob->setText(titles[i]);
-		knob->setStyleSheet(
-			defaultKnobStyleSheet(env));
+		knob->setKnobType(env);
+
+		knob->checkState();
 
 		// knob.setStyleSheet(knobDefaultStyleSheet('env'))
 		// knob.checkState()

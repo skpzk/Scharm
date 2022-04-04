@@ -10,8 +10,11 @@
 class Wave{
   public:
     Wave(int);
+    Wave(int, sample_t);
     Wave();
     sample_t wave[TABLE_SIZE];
+
+    // void setMaxValue(sample_t);
   private:
     sample_t maxValue = MAX;
     void sine();

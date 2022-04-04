@@ -12,6 +12,7 @@ float trim(float, int);
 void initBuffer(sample_t* buffer, int frames, int value);
 void initBuffer(sample_t* buffer, int value);
 void initBuffer(sample_t* buffer);
+void initBuffer(void* buffer);
  
 
 

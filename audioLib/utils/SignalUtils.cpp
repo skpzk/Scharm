@@ -29,3 +29,8 @@ void initBuffer(sample_t* buffer, int value){
 void initBuffer(sample_t* buffer){
     initBuffer(buffer, 0);
 }
+
+void initBuffer(void* buffer){
+    sample_t* buf = (sample_t*) buffer;
+    initBuffer(buf, 0);
+}

@@ -13,12 +13,14 @@ AudioObject()
   this->phase = 0;
   this->vco_or_sub = 0; // 0: vco
   wave = Wave(0);
+  waveType = 0;
 
   lastOutput = 0;
 }
 
 void Osc::setWave(float type){
   waveType = type;
+  type = (type==PURE_SQR ? SQR : type);
   if(vco_or_sub == 0){
     wave = Wave(type);
   }else{
@@ -30,6 +32,14 @@ void Osc::setWave(float type){
   }
 }
 
+// void Osc::setLocalMaxToOne(){
+//   localMax=1;
+// }
+
+// void Osc::resetLocalMax(){
+//   localMax=MAX;
+// }
+
 void Osc::setFreq(float freq){
   this->freq = freq;
   // printf("freq = %f\n", freq);
@@ -38,6 +48,10 @@ void Osc::setFreq(float freq){
 
 void Osc::setNoteMidi(float note){
   this->setFreq(mtof(note));
+}
+
+void Osc::updateFreq(int _){
+  ;
 }
 
 void Osc::updatePhaseIncrement(){
@@ -80,8 +94,6 @@ void Osc::outputWave(void* outputBuffer){
   switch(waveType){
 
     case SAW:
-    // printf("here");
-      // maxTri = 0;
       for(int i=0; i<FRAMES_PER_BUFFER; i++){
         double value = this->wave.wave[(int)this->phase];
         value -= MAX * poly_blep(this->phase / TABLE_SIZE);
@@ -92,6 +104,7 @@ void Osc::outputWave(void* outputBuffer){
         // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
         // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
         *out++ += value  * this->volume ;  // right
+        updateFreq(i);
         this->phase += (this->phaseIncrement);
         if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
       }
@@ -113,6 +126,7 @@ void Osc::outputWave(void* outputBuffer){
         // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
         // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
         *out++ += value  * this->volume ;  // right
+        updateFreq(i);
         this->phase += (this->phaseIncrement);
         if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
       }
@@ -146,6 +160,7 @@ void Osc::outputWave(void* outputBuffer){
         // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
         // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
         *out++ += value  * this->volume ;  // right
+        updateFreq(i);
         this->phase += (this->phaseIncrement);
         if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
       }
@@ -157,8 +172,15 @@ void Osc::outputWave(void* outputBuffer){
 
     default:
       for(int i=0; i<FRAMES_PER_BUFFER; i++){
+        if(this->phase > TABLE_SIZE){
+          printf("phase = %f\n", this->phase);
+          printf("i = %d\n", i);
+          printf("sequence[i-2] = %f\n", this->sequence[i-2]);
+          std::cout << "sequence[i-2] = " << this->sequence[i-2] << std::endl;
+        }
         *out++ += this->wave.wave[(int)this->phase] * this->volume;  // mono/left
         *out++ += this->wave.wave[(int)this->phase] * this->volume;  // right
+        updateFreq(i);
         this->phase += (this->phaseIncrement);
         if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
       }
@@ -175,9 +197,16 @@ void Osc::outputWave(void* outputBuffer){
 //   }
 // }
 
+// seq value -> range -> add to knob freq and freq CV -> quantize
 Vco::Vco() :
 Osc(){
   vco_or_sub = 0;
+  range = 1;
+  seq = new AudioObject();
+}
+
+void Vco::setSequencer(AudioObject * s){
+  seq = s;
 }
 
 void Vco::updateWaveType(int newWaveType){
@@ -213,9 +242,45 @@ float Vco::getFreq(){
 }
 
 void Vco::updateFreq(){
+  // seq value -> range -> add to knob freq and freq CV -> quantize
+
+
+
   this->freq = knobFreq;
+
+  //debug
+  float tmpFreq = freq;
+
+
   // quantize freq
   quantizeFloat(&this->freq, quantValue);
+
+
+  // setFreq(knobFreq);
+  updatePhaseIncrement();
+}
+
+void Vco::updateFreq(int i){
+  // seq value -> range -> add to knob freq and freq CV -> quantize
+
+  // sample_t s = sequence[2*i];
+  // double ds = (double) s;
+  // double dsCorrected = ((double)sequence[2*i])/127.;
+  // double dsCorrectedRange = ((double)sequence[2*i])/127. * range;
+  // float kFreq = knobFreq;
+  // double mFreq = ftom(knobFreq);
+  // double mFreqComplete = ((double)sequence[2*i])/127. * range + ftom(knobFreq);
+
+  // double fFreq = mtof(((double)sequence[2*i])/127. * range + ftom(knobFreq));
+
+
+  this->freq = mtof(((double)sequence[2*i])/127. * range * 12 + ftom(knobFreq));
+
+  // printf("freq = %f\n", freq);
+
+  // quantize freq
+  quantizeFloat(&this->freq, quantValue);
+
 
   // setFreq(knobFreq);
   updatePhaseIncrement();
@@ -226,6 +291,11 @@ void Vco::output(void* outputBuffer){
   checkValues();
   // printf("Vco1knobfreq = %f\n", *State::params(stateKeys.freq));
   // update Freq
+
+  initBuffer(sequence);
+
+  seq->output((void*) sequence);
+
   updateFreq();
 
   
@@ -269,7 +339,20 @@ void Sub::computeDiv(){
 
   // create an array with the div values
 
-  div = knobDiv;
+  div = trim(knobDiv, 1, knobDiv);
+}
+
+void Sub::updateFreq(int i){
+  // seq value -> range -> add to knob freq and freq CV -> quantize
+
+
+
+  if(vco != nullptr)
+  freq = this->vco->getFreq() / this->div;
+
+
+  // setFreq(knobFreq);
+  updatePhaseIncrement();
 }
 
 void Sub::output(void* outputBuffer){
@@ -283,8 +366,7 @@ void Sub::output(void* outputBuffer){
   computeDiv();
 
   // update Freq
-  if(vco != nullptr)
-  freq = this->vco->getFreq() / this->div;
+  
 
   // update Phase Increment
   updatePhaseIncrement();

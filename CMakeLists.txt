@@ -12,51 +12,55 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
 set(SOURCES
-    scharm.cpp              scharm.h
+    scharm.cpp    
+    
+    design/filter.cpp    
+    
+    utils/utils.cpp
+    utils/fileio.cpp    
+    
+    gui/window.cpp
+    gui/utils.cpp
+    gui/defs.cpp
 
-    design/filter.cpp       design/filter.h
+    gui/sections/section.cpp
+    gui/sections/filter.cpp
+    gui/sections/general.cpp
+    gui/sections/env.cpp
+    gui/sections/transport.cpp
+    gui/sections/sequencer.cpp
+    gui/sections/rhythm.cpp
+    gui/sections/vcos.cpp
+    gui/sections/patchbay.cpp
 
-    utils/utils.cpp         utils/utils.h
-    utils/fileio.cpp        utils/fileio.h
+    gui/widgets/sectionLabel.cpp
+    gui/widgets/knob.cpp
+    gui/widgets/button.cpp
+    gui/widgets/waveSlider.cpp
+    gui/widgets/radio.cpp
+    gui/widgets/patchpoint.cpp
+    gui/widgets/patchcordList.cpp
+    gui/widgets/patchcord.cpp
 
-    gui/window.cpp          gui/window.h 
-    gui/utils.cpp           gui/utils.h
-    gui/defs.cpp            gui/defs.h
+    state/state.cpp
 
-    gui/sections/section.cpp        gui/sections/section.h
-    gui/sections/filter.cpp         gui/sections/filter.h
-    gui/sections/general.cpp        gui/sections/general.h
-    gui/sections/env.cpp            gui/sections/env.h
-    gui/sections/transport.cpp      gui/sections/transport.h
-    gui/sections/sequencer.cpp      gui/sections/sequencer.h
-    gui/sections/rhythm.cpp         gui/sections/rhythm.h
-    gui/sections/vcos.cpp           gui/sections/vcos.h
-    gui/sections/patchbay.cpp       gui/sections/patchbay.h
+    audioApi/audio.cpp
+    audioLib/patch.cpp
 
-    gui/widgets/sectionLabel.cpp    gui/widgets/sectionLabel.h
-    gui/widgets/knob.cpp            gui/widgets/knob.h
-    gui/widgets/button.cpp          gui/widgets/button.h
-    gui/widgets/waveSlider.cpp      gui/widgets/waveSlider.h
-    gui/widgets/radio.cpp           gui/widgets/radio.h
-    gui/widgets/patchpoint.cpp      gui/widgets/patchpoint.h
-    gui/widgets/patchcordList.cpp   gui/widgets/patchcordList.h
-    gui/widgets/patchcord.cpp       gui/widgets/patchcord.h
+    audioLib/objects/audioObject.cpp
+    audioLib/objects/osc.cpp
+    audioLib/objects/Wave.cpp
+    audioLib/objects/mixer.cpp
+    audioLib/objects/filter.cpp
+    audioLib/objects/audioDetector.cpp
+    audioLib/objects/clock.cpp
+    audioLib/objects/vca.cpp
+    audioLib/objects/sequencer.cpp
+    audioLib/objects/env.cpp
 
-    state/state.cpp     state/state.h
-
-    audioApi/audio.cpp                  audioApi/audio.h
-
-    audioLib/patch.cpp                  audioLib/patch.h
-
-    audioLib/objects/audioObject.cpp    audioLib/objects/audioObject.h
-    audioLib/objects/osc.cpp            audioLib/objects/osc.h
-    audioLib/objects/Wave.cpp           audioLib/objects/Wave.h
-    audioLib/objects/mixer.cpp          audioLib/objects/mixer.h
-    audioLib/objects/filter.cpp         audioLib/objects/filter.h
-
-    audioLib/utils/SignalUtils.cpp      audioLib/utils/SignalUtils.h
-    audioLib/utils/midi.cpp             audioLib/utils/midi.h
-    audioLib/utils/quantize.cpp         audioLib/utils/quantize.h
+    audioLib/utils/SignalUtils.cpp
+    audioLib/utils/midi.cpp
+    audioLib/utils/quantize.cpp
     # audioLib/utils/fft.cpp              audioLib/utils/fft.h
 )
 
@@ -72,9 +76,15 @@ find_package(Matplot++ REQUIRED)
 # add_executable(scharm main.cpp)
 # target_link_libraries(scharm PUBLIC Matplot++::matplot)
 
-
-
+target_include_directories(scharm PUBLIC 
+#     "/usr/include/matplotlib-cpp" 
+#     "/usr/include/python3.8"
+    "/usr/lib/python3.10/site-packages/numpy/core/include"
+    )
+find_package(pybind11 REQUIRED)
 # list(APPEND CMAKE_MODULE_PATH "/usr/include/matplotlib-cpp/")
+
+
 
 if (UNIX)
     target_link_libraries(scharm  
@@ -87,12 +97,17 @@ if (UNIX)
         rt
         m
         dl
-        Matplot++::matplot
+        # Matplot++::matplot
+        python3.10
         fftw3 # fft lib
+        pybind11::embed
+        # pybind11
+        pybind11::module
+        
         )
 endif (UNIX)
 
-# -I/usr/local/include/python2.7 \
+# -I/usr/local/include/python2.7 
 # -I/usr/local/lib/python2.7/site-packages/numpy/core/include -lpython2.7
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

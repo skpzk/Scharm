@@ -11,7 +11,8 @@ void Mixer::addInput(AudioObject * in){
 
 void Mixer::output(void* outputBuffer){
   sample_t * out = (sample_t*) outputBuffer;
-  initBuffer(out, FRAMES_PER_BUFFER*CHANNELS, 0);
+  // initBuffer(out, FRAMES_PER_BUFFER*CHANNELS, 0);
+  initBuffer(outputBuffer);
   for(AudioObject* it : this->inputs){
     it->output(outputBuffer);
   }

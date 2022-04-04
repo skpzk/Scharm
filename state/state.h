@@ -86,6 +86,10 @@ class Param;
  *    where
  *     void nonMemberCallback(void* voidPtr, float value);
  *    ignores the voidPtr
+ * 	 
+ * 	 Callbacks are called each time the corresponding param's value is changed,
+ *   either via State::params("name")->setValue( floatValue );
+ *   or State::params("name", floatValue);
  * 
  *   To execute callbacks :
  *     

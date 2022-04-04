@@ -20,6 +20,10 @@ public:
                const QString& text = "");
 
     void setText(string);
+    void setStateParamText(string);
+
+    void checkState();
+    void warnState(int);
 
 private:
 
@@ -37,6 +41,7 @@ private:
     // double radius;
     
     // QPointF center;
+    string stateKey;
 
     QString text_;
 

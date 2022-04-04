@@ -25,6 +25,8 @@ typedef struct
 	std::string d = "";
 	std::string div = "";
 	std::string sub1level = "";
+	std::string filterType = "filtersradio";
+	std::string guiCallback = "";
 }StateKeys;
 
 

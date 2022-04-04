@@ -6,6 +6,7 @@
 #include <QBrush>
 
 #include <QRectF>
+#include <QMouseEvent>
 
 #include "knob.h"
 
@@ -15,6 +16,7 @@
 #include "../../state/state.h"
 
 #include <set>
+
 
 
 std::set<std::string> implementedKnobs = {};
@@ -40,10 +42,51 @@ Knob::Knob(QWidget * parent,
 
     // this->valueChanged.connect();
     // connect(lineedit, &QLineEdit::textChanged, this, &YourWidget::MySlot);
-    connect(this, &QDial::valueChanged, this, &Knob::warnState);
+    connectWarnState();
+
+    // trying this to prevent recursive repaint and segfaults
+    connect(this, &Knob::repaintTitle, this, &Knob::repaintSlot);
 
     debug_print_rects = true;
     debug_print_rects = false;
+
+    // extent is the angle of the colored line around the knob, 
+    // and of the total travel of the knob
+    // offset is used to display it with vertical symmetry
+    extent = 1.5 * M_PI;
+    offset = 1.25 * M_PI;
+
+    id = -1;
+    kType = general;
+}
+
+void Knob::setKnobType(knobType kt){
+    kType = kt;
+    setStyleSheet(defaultKnobStyleSheet(kType));
+}
+
+void Knob::setId(int i){
+    id = i;
+}
+
+void Knob::connectWarnState(){
+    connect(this, &QDial::valueChanged, this, &Knob::warnState);
+}
+
+void Knob::disconnectWarnState(){
+    disconnect(this, &QDial::valueChanged, this, &Knob::warnState);
+}
+
+void Knob::setMinimum(int m){
+    disconnectWarnState();
+    QDial::setMinimum(m);
+    connectWarnState();
+}
+
+void Knob::setMaximum(int M){
+    disconnectWarnState();
+    QDial::setMaximum(M);
+    connectWarnState();
 }
 
 void Knob::setText(string text){
@@ -62,16 +105,14 @@ void Knob::setStateParamText(string text){
 // }
 
 void Knob::warnState(int _){
-    // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
-    // # print("value = ", self.value())
+
     // cout << "warning state :\n";
     // cout << "key = " << stateKey << ", value = " << (float) value() / maximum() << endl;
     State::params(stateKey)->setValue((float) value());
 }
 
 void Knob::checkState(){
-    // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
-    // # print("value = ", self.value())
+
     // cout << "checking state :\n";
     // cout << "key = " << stateKey << ", value = " << (float) *State::params(stateKey) << endl;
     // State::params(stateKey)->setValue(value() / maximum());
@@ -86,13 +127,62 @@ QColor Knob::getRingColor() const{
     return QColor("black");
 }
 
+void Knob::mousePressEvent(QMouseEvent* ev){
+    if(distance(ev->pos(), this->center) < this->radius){
+        mouseEvent(ev);
+        ignoresMouse = false;
+    }
+    else{
+        // printf("mouse outside of knob\n");
+        ignoresMouse = true;
+    }
+}
+
+void Knob::mouseMoveEvent(QMouseEvent* ev){
+    if(!ignoresMouse)
+        mouseEvent(ev);
+}
+
+void Knob::mouseReleaseEvent(QMouseEvent* ev){
+    if(!ignoresMouse){
+        mouseEvent(ev);
+        ignoresMouse = true;
+    }
+}
+
+void Knob::mouseEvent(QMouseEvent* ev){
+    // super(Knob, self).mousePressEvent(me)
+    ev->accept();
+    // printf("event accepted\n");
+    double angle = atan2(ev->pos().x() - this->center.x(), -ev->pos().y() + this->center.y());
+    angle += M_PI;
+
+    angle = angle * 1/extent - (2*M_PI - extent)/(2*extent);
+    // printf("angle = %0.3f\n", angle);
+    this->setValue(this->minimum() + angle * (this->maximum() - this->minimum()));
+}
+
+void Knob::changeTitleColorCallback(void* voidInstance, float value){
+    Knob* instance = (Knob*) voidInstance;
+    // string title = instance->text_.toStdString();
+    // printf("knob %s called, value = %0.2f\n", title.c_str(), value);
+    // std::cout << title << std::endl;
+    if((instance->kType == seq) && (instance->id != (int) value))
+        value = false;
+
+    instance->coloredTitle = (bool) value;
+    emit instance->repaintTitle();
+    // instance->repaint();
+
+}
+
+void Knob::repaintSlot(){
+    repaint();
+}
+
 void Knob::paintEvent(QPaintEvent*){
 
-    // extent is the angle of the colored line around the knob, 
-    // and of the total travel of the knob
-    // offset is used to display it with vertical symmetry
-    float extent = 1.5 * M_PI;
-    float offset = 1.25 * M_PI;
+
 
     QPainter painter(this);
 
@@ -246,7 +336,7 @@ void Knob::paintEvent(QPaintEvent*){
     QRectF textRect = QRectF(0, center_y + radius + fontsize1*2, QDial::width(), 2*fontsize2);
 
     if(this->hasFocus())
-    painter.setPen(QColor("red"));
+        painter.setPen(QColor("red"));
 
     f.setPointSizeF(fontsize2);
     painter.setFont(f);

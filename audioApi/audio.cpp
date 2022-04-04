@@ -20,13 +20,20 @@ int paCallback( const void *inputBuffer, void *outputBuffer,
 	int finished = 0;
 	(void) inputBuffer; /* Prevent unused variable warnings. */
 
+	data->clock->update();
+
 	if (data->audio != NULL) {
 		data->audio->output(out);
 	}else{
+		printf("error, audio object output is not defined !\n");
 		for(int i=0; i<FRAMES_PER_BUFFER*2; i++){
 			*out++ = SILENCE;
 		}
 	}
+
+	// for(int i=0; i<FRAMES_PER_BUFFER*2; i++){
+	// 	*out++ = SILENCE;
+	// }
 
 	// send silence
 	
@@ -41,6 +48,11 @@ int paCallback( const void *inputBuffer, void *outputBuffer,
 	// printf("%i\n", (1<<16) * data->counter);
 
 	return finished;
+}
+
+Audio::Audio(){
+	this->data.audio = new AudioObject();
+	this->data.clock = new Clock();
 }
 
 int Audio::start(){
@@ -117,4 +129,9 @@ PaError Audio::stopStream(){
 void Audio::setInput(AudioObject* input){
 	this->data.audio = input;
 	printf("Output added to audio\n");
+}
+
+void Audio::setClock(AudioObject* clk){
+	this->data.clock = clk;
+	printf("Clock added to audio\n");
 }

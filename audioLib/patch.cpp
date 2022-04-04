@@ -3,6 +3,11 @@
 #include "objects/mixer.h"
 #include "objects/osc.h"
 #include "objects/filter.h"
+#include "objects/vca.h"
+
+#include "objects/clock.h"
+#include "objects/sequencer.h"
+#include "objects/env.h"
 
 Patch::Patch(){
   Mixer *mixer = new Mixer;
@@ -61,17 +66,117 @@ Patch::Patch(){
 
   mixer->addInput(vco2sub2);
 
+  Clock * clock = new Clock();
+  clock->stateKeys.guiCallback = "activetempo";
+
+  RhythmGenerator * rg1 = new RhythmGenerator();
+  rg1->stateKeys.div = "clk1";
+  rg1->stateKeys.guiCallback = "activerhythm1";
+  rg1->setInput(clock);
+
+  RhythmGenerator * rg2 = new RhythmGenerator();
+  rg2->stateKeys.div = "clk2";
+  rg2->stateKeys.guiCallback = "activerhythm2";
+  rg2->setInput(clock);
+
+  RhythmGenerator * rg3 = new RhythmGenerator();
+  rg3->stateKeys.div = "clk3";
+  rg3->stateKeys.guiCallback = "activerhythm3";
+  rg3->setInput(clock);
+
+  RhythmGenerator * rg4 = new RhythmGenerator();
+  rg4->stateKeys.div = "clk4";
+  rg4->stateKeys.guiCallback = "activerhythm4";
+  rg4->setInput(clock);
+
+  clock->addRhythm(rg1);
+  clock->addRhythm(rg2);
+  clock->addRhythm(rg3);
+  clock->addRhythm(rg4);
+
+  Sequencer * seq1 = new Sequencer();
+  seq1->stateKeys.step1 = "seq1step1";
+  seq1->stateKeys.step2 = "seq1step2";
+  seq1->stateKeys.step3 = "seq1step3";
+  seq1->stateKeys.step4 = "seq1step4";
+  seq1->stateKeys.clk1 = "seq1clk1";
+  seq1->stateKeys.clk2 = "seq1clk2";
+  seq1->stateKeys.clk3 = "seq1clk3";
+  seq1->stateKeys.clk4 = "seq1clk4";
+  seq1->stateKeys.guiCallback = "activeseq1step";
+
+  seq1->addRhythm(rg1);
+  seq1->addRhythm(rg2);
+  seq1->addRhythm(rg3);
+  seq1->addRhythm(rg4);
+
+  vco1->setSequencer(seq1);
+
+  clock->addSeq(seq1);
+
+
+  Sequencer * seq2 = new Sequencer();
+  seq2->stateKeys.step1 = "seq2step1";
+  seq2->stateKeys.step2 = "seq2step2";
+  seq2->stateKeys.step3 = "seq2step3";
+  seq2->stateKeys.step4 = "seq2step4";
+  seq2->stateKeys.clk1 = "seq2clk1";
+  seq2->stateKeys.clk2 = "seq2clk2";
+  seq2->stateKeys.clk3 = "seq2clk3";
+  seq2->stateKeys.clk4 = "seq2clk4";
+  seq2->stateKeys.guiCallback = "activeseq2step";
+
+  seq2->addRhythm(rg1);
+  seq2->addRhythm(rg2);
+  seq2->addRhythm(rg3);
+  seq2->addRhythm(rg4);
+
+  vco2->setSequencer(seq2);
+
+  clock->addSeq(seq2);
+
+  
+
   Vcf * vcf = new Vcf();
 
   vcf->stateKeys.freq = "cutoff";
   vcf->stateKeys.reso = "reso";
 
+  // vcf->setInput(mixer);
   vcf->setInput(mixer);
 
+  // Osc* osc = new Osc();
 
-  this->outputObj = vcf;
+  Vca * vca = new Vca();
+
+  vca->setInput(vcf);
+
+  ConstantAudioObject * aao = new ConstantAudioObject();
+  aao->setDefaultValue(MAX);
+  // vca->setEnv(aao);
+
+  Env * eg = new Env();
+  eg->stateKeys.a = "a";
+  eg->stateKeys.d = "d";
+
+  eg->addRhythm(seq1);
+  eg->addRhythm(seq2);
+
+  vca->setEnv(eg);
+
+  // vca->setEnv(clock);
+
+
+  this->outputObj = vca;
+  this->masterClock = clock;
 }
 
 void Patch::output(void* out){
+  initBuffer(out);
   outputObj->output(out);
+}
+
+void Patch::update(){
+  this->masterClock->update();
+
 }
