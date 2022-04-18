@@ -41,8 +41,11 @@ class Radio : public QRadioButton
         void setStateParam(QString);
         void checkState();
 
+        void setValue(int);
+
     private:
         int ID;
+        int value;
 
         QPointF center;
         QRectF textRect;

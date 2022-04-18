@@ -23,6 +23,8 @@ void Clock::updatePhaseIncrement(){
 
 void Clock::updateClockSignal(){
 
+  if(!playing) {initBuffer(clockSignal); return;}
+
   double value;
   // double maxClock = 0, minClock = MAX;
   for(int i=0; i<FRAMES_PER_BUFFER; i++){
@@ -55,6 +57,8 @@ void Clock::checkValues(){
   // printf("ftom(50 - 1./3) = %f\n", ftom(50 - 1./3));
   // printf("ftom(50) = %f\n", ftom(50));
   setFreq(freq);
+
+  playing = (bool) State::params("play")->getValue();
 }
 
 void Clock::addRhythm(AudioObject* r){
@@ -68,6 +72,8 @@ void Clock::addSeq(AudioObject* r){
 void Clock::tick(){
   // check values:
   checkValues();
+
+  
   // updates self
   updateClockSignal();
   
@@ -90,6 +96,7 @@ void Clock::updateParam(){
 }
 
 void Clock::update(){
+  // std::cout << "updating clock\n";
   tick();
   updateParam();
 }
@@ -111,8 +118,10 @@ void Clock::output(void* buffer){
 
 RhythmGenerator::RhythmGenerator(){
   div=1;
-  accum = 1;
-  lastValueIn = 1;
+  accum = 0;
+  lastValueIn = 0;
+  lastValueOut = 1;
+  reset=false;
 
 }
 
@@ -124,17 +133,30 @@ void RhythmGenerator::checkValues(){
   div = (int) *State::params(stateKeys.div);
   // printf("div = %d\n", div);
   // setFreq(freq);
+  bool tmpReset = State::params("reset")->getValue();
+  if(tmpReset != reset){ // reset only when the button is toggled, not held
+    reset = tmpReset;
+    if(reset){
+      accum = 0;
+      lastValueIn = 0;
+      lastValueOut = 1;
+    }
+  }
 }
 
 void RhythmGenerator::updateClockSignal(){
+  // TODO:
+  // comment this!
   float value;
   initBuffer(clockSignal);
   initBuffer(risingEdgeSignal);
   masterClock->output((void*) clockSignal);
   
   for(int i=0; i<FRAMES_PER_BUFFER; i++){
-    value = clockSignal[2*i];
-    accum += (lastValueIn != value?1:0);
+    value = clockSignal[2*i]; // get pulse
+    accum += (lastValueIn != value?1:0); // detect change in pulse
+    // each time there is a change, increment accum;
+
     lastValueIn = value;
 
     lastValueOut = (accum == div?1-lastValueOut:lastValueOut);

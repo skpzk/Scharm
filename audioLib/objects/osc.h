@@ -66,6 +66,7 @@ class Vco : public Osc{
 
 		void setSequencer(AudioObject*);
 
+		void computeFreq(int);
 	private:
 		void checkValues();
 
@@ -73,14 +74,14 @@ class Vco : public Osc{
 		float knobFreq = 0;
 		int quantValue;
 		int range;
-		bool seqActive;
 		
 		void updateFreq();
 		virtual void updateFreq(int );
 
-		AudioObject * seq;
 
 	protected:
+		AudioObject * seq;
+		bool seqActive;
 		void updateWaveType(int);
 };
 

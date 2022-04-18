@@ -12,7 +12,7 @@ typedef struct
 	std::string volume = "";
 	std::string range = "rangeradio";
 	std::string assignvco = "";
-	std::string assignsub = "";
+	// std::string assignsub = "";
 	std::string step1 = "";
 	std::string step2 = "";
 	std::string step3 = "";

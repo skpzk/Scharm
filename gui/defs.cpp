@@ -10,6 +10,8 @@ Theme::Theme(){
         buttonBackground = "#111111";
         // buttonBackground = "red";
         pointColor = "white";
+				activeColor = pointColor,
+				inactiveColor = "black",
         barsColor = "#aaaaaa";
         sectionLabelColor = backgroundColor;
         ppColor = backgroundColor;
@@ -66,24 +68,31 @@ QString buttonDefaultStyleSheet(){
 	string styleSheet = 
 		"Button{"
 			"background-color: buttonBackground;"
+			// "qproperty-backgroundColor: buttonBackground;"
 			"border: 1px solid #aaa;"
-			"color: white;"
+			"color: buttonForeground;"
+			// "qproperty-foregroundColor: buttonForeground;"
 		"}"
-		"Button::Checked{"
+		"Button:Checked{"
 			"background-color: #d4d4d4;"
+			// "qproperty-backgroundColor: orange;"
 			"border: 0px;"
-			"color: black;"
+			"color: buttonForegroundChecked;"
+			// "qproperty-foregroundColor: buttonForegroundChecked;"
 		"}"
-		"Button::Pressed{"
+		"Button:Pressed{"
 			"background-color: #343434;"
+			// "background-color: orange;"
 			"border: 0px;"
 		"}"
-		"HoldButton{"
-			"qproperty-holdColor: orange;"
+		"Button:Held{"
+			"background-color: orange;"
 		"}"
 		"";
 
 	styleSheet = replaceAll(styleSheet, "buttonBackground", theme.buttonBackground);
+	styleSheet = replaceAll(styleSheet, "buttonForeground", theme.activeColor);
+	styleSheet = replaceAll(styleSheet, "buttonForegroundChecked", theme.inactiveColor);
 	return QString::fromStdString(styleSheet);
 }
 

@@ -56,9 +56,12 @@ QHBoxLayout *secondLine(int *stretches){
 	for(int i=0; i<3; i++){
 		Radio *rangeRadio = new Radio(QString::fromStdString("±" + to_string(ranges[i])), i);
 		
-		// rangeRadio->setStateParam('rangeradio');
+		rangeRadio->setStateParam("rangeradio");
+
+		rangeRadio->setValue(ranges[i]);
+
 		// rangeRadio->stateValue = "r" + str(ranges[i]);
-		// rangeRadio->checkState();
+		rangeRadio->checkState();
 
 		vboxrange->addWidget(rangeRadio);
 		// rangeGroup.addButton(rangeRadio)
@@ -172,6 +175,8 @@ QHBoxLayout *fifthLine(){
 			
 			button->setStyleSheet(buttonDefaultStyleSheet());
 			button->setCheckable(true);
+
+			button->setStateParamText("seq" + to_string(i+1) + "assignTo" + titles[ii]);
 
 
 			// stateParam = "seq" + str(i + 1) + "assign" + titles[ii]

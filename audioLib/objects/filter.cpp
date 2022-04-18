@@ -77,6 +77,10 @@ void BiquadFilter::setInput(AudioObject* in){
   this->input = in;
 }
 
+void BiquadFilter::setEgInput(AudioObject* ao){
+  egInput = ao;
+}
+
 void BiquadFilter::filter(void* outputBuffer){
   sample_t in[2*FRAMES_PER_BUFFER];
 
@@ -126,6 +130,8 @@ MFilter::MFilter(){
   // this->audioOutput = new AudioOutput(this);
   this->computeCoefs();
   this->reset();
+
+  this->egInput = new AudioObject;
 }
 
 void MFilter::setFc(float fc){
@@ -155,6 +161,19 @@ void MFilter::computeCoefs(){
   // printf("a0 = %f, G = %f, K = %f, alpha0 = %f\n", a0, G, K, alpha0);
 }
 
+void MFilter::computeCoefsInLoop(double loopFc){
+  w0 = 2 * M_PI * loopFc / SAMPLE_RATE;
+  g = cos(w0) / (1+sin(w0));
+  a0 = (1-g)/2;
+  // a1 = a0;
+  // b1 = -g;
+  // K = Q;
+
+  alpha0 = 1. / (1. + Q * pow(a0, 4));
+
+  // printf("a0 = %f, G = %f, K = %f, alpha0 = %f\n", a0, G, K, alpha0);
+}
+
 void MFilter::setQ(float Q){
   this->Q = 4 * trim(Q, 0, 127)/127;
   this->computeCoefs();
@@ -164,6 +183,14 @@ void MFilter::setK(float k){
   this->Q = k;
   this->K = k;
   this->computeCoefs();
+}
+
+void MFilter::setEgAmount(float e){
+  egAmount = e;
+}
+
+void MFilter::setEgInput(AudioObject* ao){
+  egInput = ao;
 }
 
 void MFilter::setInput(AudioObject* in){
@@ -187,8 +214,10 @@ void MFilter::filter(void* outputBuffer){
   sample_t in[2*FRAMES_PER_BUFFER];
 
   initBuffer(in);
+  initBuffer(env);
 
   this->input->output(in);
+  this->egInput->output(env);
   
   sample_t *out = (sample_t*)outputBuffer;
   float data;
@@ -205,6 +234,8 @@ void MFilter::filter(void* outputBuffer){
 
   double y1, y2, y3, y4;
 
+  // std::cout << trim(mtof(ftom(fc) + egAmount * 127 * ((double)env[0])/MAX), 21000) <<std::endl;
+
 	for(int i=0; i<FRAMES_PER_BUFFER; i++){ 
 
     
@@ -214,12 +245,19 @@ void MFilter::filter(void* outputBuffer){
 
     // xn *= compensationGain;
 
-    s1 = a1 * x11 - b1 * y11;
-    s2 = a1 * x21 - b1 * y21;
-    s3 = a1 * x31 - b1 * y31;
-    s4 = a1 * x41 - b1 * y41;
+    // s1 = a1 * x11 - b1 * y11;
+    // s2 = a1 * x21 - b1 * y21;
+    // s3 = a1 * x31 - b1 * y31;
+    // s4 = a1 * x41 - b1 * y41;
 
-    un = alpha0 * (xn - K * (g3 * s1 + g2 * s2 + g1 * s3 + g0 * s4));
+    computeCoefsInLoop(trim(mtof(ftom(fc) + egAmount * 64 * ((double)env[2*i])/MAX), 21000));
+
+    s1 = a0 * x11 + g * y11;
+    s2 = a0 * x21 + g * y21;
+    s3 = a0 * x31 + g * y31;
+    s4 = a0 * x41 + g * y41;
+
+    un = alpha0 * (xn - Q * (a0 * a0 * a0 * s1 + a0 * a0 * s2 + a0 * s3 + s4));
 
 
     y1 = un * a0 + s1;
@@ -252,199 +290,6 @@ void MFilter::output(void* out){
   this->filter(out);
 }
 
-OnFilter::OnFilter(){
-  // this->filterType = lpf;
-  this->maxFc = SAMPLE_RATE/2;
-  this->T = 1. / SAMPLE_RATE;
-  this->setFc(1000.);
-  // this->audioOutput = new AudioOutput(this);
-  this->computeCoefs();
-
-}
-
-void OnFilter::setFc(float fc){
-  if(fc != this->fc){
-    this->fc = trim(fc, this->maxFc);
-    this->computeCoefs();
-    // printf("fc = %f\n", fc);
-  }
-}
-
-void OnFilter::setQ(float q){
-
-}
-
-void OnFilter::computeCoefs(){
-  double w0 = 2 * M_PI * this->fc;
-  double RC = 1. / w0;
-  a0 = T / (RC + T);
-
-  // printf("a0 = %f, G = %f, K = %f, alpha0 = %f\n", a0, G, K, alpha0);
-}
-
-void OnFilter::setInput(AudioObject* in){
-  this->input = in;
-}
-
-void OnFilter::filter(void* outputBuffer){
-}
-void OnFilter::output(void* out){
-  this->filter(out);
-}
-
-O1Filter::O1Filter() : OnFilter(){}
-void O1Filter::output(void* out){
-  this->filter(out);
-}
-
-void O1Filter::filter(void* outputBuffer){
-  sample_t in[2*FRAMES_PER_BUFFER];
-
-  initBuffer(in);
-
-  this->input->output(in);
-  
-  sample_t *out = (sample_t*)outputBuffer;
-
-  // BiquadState tmpState;
-  double un;
-
-	for(int i=0; i<FRAMES_PER_BUFFER; i++){ 
-
-    un = ((double) in[i*2]);
-    // un = un/MAX;
-
-    y0 = un * a0 + (1-a0) * y0;
-
-    // printf("y3 = %f\n", y[3]);
-
-    // double limiterOutput = audioLimiter ? peakLimiter.processAudioSample(LPF3) : LPF3;
-
-    *out++ = (sample_t) (y0 * MAX);  // mono/left
-    *out++ = (sample_t) (y0 * MAX);  // right
-
-
-  }
-
-}
-
-O2Filter::O2Filter() : OnFilter(){}
-void O2Filter::output(void* out){
-  this->filter(out);
-}
-
-void O2Filter::filter(void* outputBuffer){
-  sample_t in[2*FRAMES_PER_BUFFER];
-
-  initBuffer(in);
-
-  this->input->output(in);
-  
-  sample_t *out = (sample_t*)outputBuffer;
-
-  // BiquadState tmpState;
-  double un;
-  // printf("y0 = %f, y1 = %f\n", y0, y1);
-
-	for(int i=0; i<FRAMES_PER_BUFFER; i++){ 
-
-    un = ((double) in[i*2]);
-    un = un/MAX;
-
-    y0 = un * a0 + (1-a0) * y0;
-    y1 = y0 * a0 + (1-a0) * y1;
-
-    // printf("y3 = %f\n", y[3]);
-
-    // double limiterOutput = audioLimiter ? peakLimiter.processAudioSample(LPF3) : LPF3;
-
-    *out++ = (sample_t) (y1 * MAX);  // mono/left
-    *out++ = (sample_t) (y1 * MAX);  // right
-
-
-  }
-
-}
-
-O4Filter::O4Filter() : OnFilter(){}
-void O4Filter::output(void* out){
-  this->filter(out);
-}
-
-void O4Filter::filter(void* outputBuffer){
-  sample_t in[2*FRAMES_PER_BUFFER];
-
-  initBuffer(in);
-
-  this->input->output(in);
-  
-  sample_t *out = (sample_t*)outputBuffer;
-
-  // BiquadState tmpState;
-  double un;
-  // printf("y0 = %f, y1 = %f\n", y0, y1);
-
-	for(int i=0; i<FRAMES_PER_BUFFER; i++){ 
-
-    un = ((double) in[i*2]);
-    un = un/MAX;
-
-    y0 = un * a0 + (1-a0) * y0;
-    y1 = y0 * a0 + (1-a0) * y1;
-    y2 = y1 * a0 + (1-a0) * y2;
-    y3 = y2 * a0 + (1-a0) * y3;
-
-    // printf("y3 = %f\n", y[3]);
-
-    // double limiterOutput = audioLimiter ? peakLimiter.processAudioSample(LPF3) : LPF3;
-
-    *out++ = (sample_t) (y3 * MAX);  // mono/left
-    *out++ = (sample_t) (y3 * MAX);  // right
-
-
-  }
-
-}
-
-O4FdbFilter::O4FdbFilter() : OnFilter(){}
-void O4FdbFilter::output(void* out){
-  this->filter(out);
-}
-
-void O4FdbFilter::filter(void* outputBuffer){
-  sample_t in[2*FRAMES_PER_BUFFER];
-
-  initBuffer(in);
-
-  this->input->output(in);
-  
-  sample_t *out = (sample_t*)outputBuffer;
-
-  // BiquadState tmpState;
-  double un;
-  // printf("y0 = %f, y1 = %f\n", y0, y1);
-
-	for(int i=0; i<FRAMES_PER_BUFFER; i++){ 
-
-    un = ((double) in[i*2]);
-    un = un/MAX;
-
-    y0 = un * a0 + (1-a0) * y0;
-    y1 = y0 * a0 + (1-a0) * y1;
-    y2 = y1 * a0 + (1-a0) * y2;
-    y3 = y2 * a0 + (1-a0) * y3;
-
-    // printf("y3 = %f\n", y[3]);
-
-    // double limiterOutput = audioLimiter ? peakLimiter.processAudioSample(LPF3) : LPF3;
-
-    *out++ = (sample_t) (y3 * MAX);  // mono/left
-    *out++ = (sample_t) (y3 * MAX);  // right
-
-
-  }
-
-}
 
 
 Vcf::Vcf(){
@@ -473,6 +318,12 @@ void Vcf::checkValues(){
 
   float ft = *State::params(stateKeys.filterType);
   fType =(FilterType) ((int) ft);
+
+  // eg amount
+
+  float egAmount = State::params("egamount")->getValue() / 127;
+
+  mFilter.setEgAmount(egAmount);
 
 
 }
@@ -504,4 +355,9 @@ void Vcf::output(void* buf){
 void Vcf::setInput(AudioObject* in){
   mFilter.setInput(in);
   bqFilter.setInput(in);
+}
+
+void Vcf::setEgInput(AudioObject* in){
+  mFilter.setEgInput(in);
+  bqFilter.setEgInput(in);
 }

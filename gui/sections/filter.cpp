@@ -51,7 +51,9 @@ QWidget *createFilterSection(Window* parent){
 		}
 
 		// knob.setStyleSheet(knobDefaultStyleSheet('general'))
-		// knob->setStateParamText("cutoff");
+		if(titles[i] == "A" || titles[i] == "D"){
+			knob->setStateParamText("filter" + titles[i]);
+		}
 		knob->checkState();
 		// if titles[i] == "Tempo":
 		// State.params.setCallback("activetempo", knob.sequencerCallback)

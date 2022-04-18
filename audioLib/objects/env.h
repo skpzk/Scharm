@@ -7,6 +7,8 @@
 
 #include <vector>
 
+enum EgSetting {off, on, held};
+
 class Env: public AudioObject{
   public:
     Env();
@@ -25,6 +27,8 @@ class Env: public AudioObject{
 
     float tau_attack, tau_decay, alpha;
     float envValue;
+
+    EgSetting egSetting;
 
     std::vector<AudioObject*> rhythms;
 

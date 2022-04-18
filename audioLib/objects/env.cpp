@@ -43,6 +43,8 @@ void Env::checkValues(){
 
   // std::cout << "a          = "<<a          << "\nd         = "<<d <<std::endl;
   // std::cout << "tau attack = "<<tau_attack << "\ntau decay = "<<tau_decay <<std::endl;
+
+  egSetting = (EgSetting) State::params("eg")->getValue();
 }
 
 sample_t Env::computeEnv(bool reset, float gate){
@@ -76,38 +78,45 @@ void Env::update(){
 void Env::updateClockSignal(){
 
   // clockSignal gets the clock signals from the rhythms
-  // the it is updated to contain the envelope
+  // it is updated to contain the envelope
   // it may backfire one day, but for now it saves us a buffer.
 
   initBuffer(clockSignal);
 
-  // TODO:
-  // it should get its rhythms from the sequencers.
-  for(int i = 0; i<std::min((int) rhythms.size(), 2); i++){
-    rhythms[i]->altOutput(clockSignal);
+  if(egSetting == on){
+    for(int i = 0; i<std::min((int) rhythms.size(), 2); i++){
+      // std::cout<<"calling alt output\n";
+      rhythms[i]->altOutput(clockSignal);
+    }
   }
 
   float value;
   sample_t envValue_sample;
   float gate = 0; // gate could come from the patchbay
 
-  for(int i=0; i<FRAMES_PER_BUFFER; i++){
-    value = clockSignal[2*i];
+  if(egSetting != held){
+      
 
-    // stepCounter = (value>0?(stepCounter + 1) % 4:stepCounter);
+    for(int i=0; i<FRAMES_PER_BUFFER; i++){
+      value = clockSignal[2*i];
 
-    // envValue = ((value>0)&&is?computeAttack():computeDecay());
+      // stepCounter = (value>0?(stepCounter + 1) % 4:stepCounter);
 
-    // value > 0 && is in decay : reset attack, compute attack
-    // value > 0 && is in attack: continue computing attack
-    // value == 0 : continue previous action
+      // envValue = ((value>0)&&is?computeAttack():computeDecay());
 
-    envValue_sample = computeEnv(value>0, gate);
+      // value > 0 && is in decay : reset attack, compute attack
+      // value > 0 && is in attack: continue computing attack
+      // value == 0 : continue previous action
+
+      envValue_sample = computeEnv(value>0, gate);
 
 
-    clockSignal[2*i] = envValue_sample;
-    clockSignal[2*i+1] = envValue_sample;
+      clockSignal[2*i] = envValue_sample;
+      clockSignal[2*i+1] = envValue_sample;
 
+    }
+  }else{
+    initBuffer(clockSignal, MAX);
   }
 }
 

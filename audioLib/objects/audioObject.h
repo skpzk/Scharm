@@ -34,4 +34,15 @@ class ConstantAudioObject: public AudioObject{
         // sample_t defaultValue;
         
 };
+
+class ArbitraryAudioObject : public AudioObject{
+  public:
+    ArbitraryAudioObject();
+
+    std::vector<double> data;
+    void altOutput(void*);
+    
+
+
+};
 #endif /* OBJECTS_AUDIOOBJECT_H */

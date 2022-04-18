@@ -23,7 +23,9 @@ class Theme{
         bool darkTheme;
         string backgroundColor, 
             buttonBackground, 
-            pointColor, 
+            pointColor,
+            activeColor,
+            inactiveColor, 
             barsColor, 
 	        sectionLabelColor,
 	        ppColor;

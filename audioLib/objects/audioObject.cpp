@@ -53,3 +53,14 @@ void ConstantAudioObject::output(void* outputBuffer){
 void ConstantAudioObject::CVOutput(void* outputBuffer){
     output(outputBuffer);
 }
+
+ArbitraryAudioObject::ArbitraryAudioObject(){}
+
+void ArbitraryAudioObject::altOutput(void* outBuffer){
+    sample_t* out = (sample_t*) outBuffer;
+    for(int i = 0; i<FRAMES_PER_BUFFER; i++){
+    // std::cout << "alt output called" << std::endl;
+    *out++ = (sample_t) data.at(i);
+    *out++ = (sample_t) data.at(i);
+    }
+}

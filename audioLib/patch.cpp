@@ -20,6 +20,7 @@ Patch::Patch(){
   vco1->stateKeys.freq = "vco1knobfreq";
   vco1->stateKeys.wave = "vco1wave";
   vco1->stateKeys.volume = "vco1level";
+  vco1->stateKeys.assignvco = "seq1assignToVco1";
 
   mixer->addInput(vco1);
 
@@ -27,6 +28,7 @@ Patch::Patch(){
   vco2->stateKeys.freq = "vco2knobfreq";
   vco2->stateKeys.wave = "vco2wave";
   vco2->stateKeys.volume = "vco2level";
+  vco2->stateKeys.assignvco = "seq2assignToVco2";
   
   mixer->addInput(vco2);
 
@@ -35,6 +37,7 @@ Patch::Patch(){
 
   vco1sub1->stateKeys.div = "vco1sub1div";
   vco1sub1->stateKeys.volume = "vco1sub1level";
+  vco1sub1->stateKeys.assignvco = "seq1assignToSub1";
   vco1sub1->setVco(vco1);
 
   mixer->addInput(vco1sub1);
@@ -44,6 +47,7 @@ Patch::Patch(){
 
   vco1sub2->stateKeys.div = "vco1sub2div";
   vco1sub2->stateKeys.volume = "vco1sub2level";
+  vco1sub2->stateKeys.assignvco = "seq1assignToSub2";
   vco1sub2->setVco(vco1);
 
   mixer->addInput(vco1sub2);
@@ -54,6 +58,7 @@ Patch::Patch(){
   vco2sub1->stateKeys.div = "vco2sub1div";
   vco2sub1->stateKeys.volume = "vco2sub1level";
   vco2sub1->setVco(vco2);
+  vco2sub1->stateKeys.assignvco = "seq2assignToSub1";
 
   mixer->addInput(vco2sub1);
 
@@ -62,6 +67,7 @@ Patch::Patch(){
 
   vco2sub2->stateKeys.div = "vco2sub2div";
   vco2sub2->stateKeys.volume = "vco2sub2level";
+  vco2sub2->stateKeys.assignvco = "seq2assignToSub2";
   vco2sub2->setVco(vco2);
 
   mixer->addInput(vco2sub2);
@@ -111,6 +117,8 @@ Patch::Patch(){
   seq1->addRhythm(rg4);
 
   vco1->setSequencer(seq1);
+  vco1sub1->setSequencer(seq1);
+  vco1sub2->setSequencer(seq1);
 
   clock->addSeq(seq1);
 
@@ -132,8 +140,17 @@ Patch::Patch(){
   seq2->addRhythm(rg4);
 
   vco2->setSequencer(seq2);
+  vco2sub1->setSequencer(seq2);
+  vco2sub2->setSequencer(seq2);
 
   clock->addSeq(seq2);
+
+  Env * filterEg = new Env();
+  filterEg->stateKeys.a = "filtera";
+  filterEg->stateKeys.d = "filterd";
+
+  filterEg->addRhythm(seq1);
+  filterEg->addRhythm(seq2);
 
   
 
@@ -144,6 +161,7 @@ Patch::Patch(){
 
   // vcf->setInput(mixer);
   vcf->setInput(mixer);
+  vcf->setEgInput(filterEg);
 
   // Osc* osc = new Osc();
 
@@ -151,8 +169,8 @@ Patch::Patch(){
 
   vca->setInput(vcf);
 
-  ConstantAudioObject * aao = new ConstantAudioObject();
-  aao->setDefaultValue(MAX);
+  // ConstantAudioObject * aao = new ConstantAudioObject();
+  // aao->setDefaultValue(MAX);
   // vca->setEnv(aao);
 
   Env * eg = new Env();

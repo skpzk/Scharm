@@ -231,6 +231,10 @@ void Vco::checkValues(){
 
   volume = trim(*State::params(stateKeys.volume), 127)/127;
 
+  range = (int) State::params("rangeradio")->getValue();
+
+  seqActive = (bool) State::params(stateKeys.assignvco)->getValue();
+
 }
 
 int Vco::getWave(){
@@ -249,7 +253,7 @@ void Vco::updateFreq(){
   this->freq = knobFreq;
 
   //debug
-  float tmpFreq = freq;
+  // float tmpFreq = freq;
 
 
   // quantize freq
@@ -258,6 +262,15 @@ void Vco::updateFreq(){
 
   // setFreq(knobFreq);
   updatePhaseIncrement();
+}
+
+void Vco::computeFreq(int i){
+  this->freq = mtof(((double)sequence[2*i])/127. * range * 12 + ftom(knobFreq));
+
+  // printf("freq = %f\n", freq);
+
+  // quantize freq
+  quantizeFloat(&this->freq, quantValue);
 }
 
 void Vco::updateFreq(int i){
@@ -274,12 +287,7 @@ void Vco::updateFreq(int i){
   // double fFreq = mtof(((double)sequence[2*i])/127. * range + ftom(knobFreq));
 
 
-  this->freq = mtof(((double)sequence[2*i])/127. * range * 12 + ftom(knobFreq));
-
-  // printf("freq = %f\n", freq);
-
-  // quantize freq
-  quantizeFloat(&this->freq, quantValue);
+  computeFreq(i);
 
 
   // setFreq(knobFreq);
@@ -294,7 +302,8 @@ void Vco::output(void* outputBuffer){
 
   initBuffer(sequence);
 
-  seq->output((void*) sequence);
+  if(seqActive)
+    seq->output((void*) sequence);
 
   updateFreq();
 
@@ -330,12 +339,18 @@ void Sub::checkValues(){
   knobDiv = trim(*State::params(stateKeys.div), 16);
 
   volume = trim(*State::params(stateKeys.volume), 127)/127;
+
+  seqActive = (bool) State::params(stateKeys.assignvco)->getValue();  
 }
 
 void Sub::computeDiv(){
   // check CV inputs
 
   // check sequence
+  initBuffer(sequence);
+
+  if(seqActive)
+    seq->output((void*) sequence);
 
   // create an array with the div values
 
@@ -347,9 +362,10 @@ void Sub::updateFreq(int i){
 
 
 
-  if(vco != nullptr)
-  freq = this->vco->getFreq() / this->div;
-
+  if(vco != nullptr){
+    this->vco->computeFreq(i);
+    freq = this->vco->getFreq() /( (int) trim((this->div + ((double) sequence[2*i])/127. * (-8)), 1, 16));
+  }
 
   // setFreq(knobFreq);
   updatePhaseIncrement();

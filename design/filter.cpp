@@ -212,22 +212,22 @@ vector<double> createDirac(int N){
   return d;
 }
 
-class ArbitraryAudioObject : public AudioObject{
-  public:
-    ArbitraryAudioObject(){};
+// class ArbitraryAudioObject : public AudioObject{
+//   public:
+//     ArbitraryAudioObject(){};
 
-    vector<double> data;
+//     vector<double> data;
 
-    void output(void* outBuffer){
-      sample_t* out = (sample_t*) outBuffer;
-      for(int i = 0; i<FRAMES_PER_BUFFER; i++){
-        *out++ = (sample_t) data.at(i);
-        *out++ = (sample_t) data.at(i);
-      }
-    };
+//     void output(void* outBuffer){
+//       sample_t* out = (sample_t*) outBuffer;
+//       for(int i = 0; i<FRAMES_PER_BUFFER; i++){
+//         *out++ = (sample_t) data.at(i);
+//         *out++ = (sample_t) data.at(i);
+//       }
+//     };
 
 
-};
+// };
 
 void filterDirac(MFilter filter, vector<double>* y){
 

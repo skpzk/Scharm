@@ -9,12 +9,15 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
+# debug plotting with python
+find_package(pybind11 REQUIRED)
 
 set(SOURCES
     scharm.cpp    
     
-    design/filter.cpp    
+    design/filter.cpp
+    design/plot.cpp
+    design/plotter.cpp
     
     utils/utils.cpp
     utils/fileio.cpp    
@@ -64,27 +67,17 @@ set(SOURCES
     # audioLib/utils/fft.cpp              audioLib/utils/fft.h
 )
 
-
-
 add_executable(scharm main.cpp ${SOURCES})
 
 find_package(Threads REQUIRED)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 
-find_package(Matplot++ REQUIRED)
+find_package(pybind11 REQUIRED)
 
-# add_executable(scharm main.cpp)
-# target_link_libraries(scharm PUBLIC Matplot++::matplot)
-
+# debug plotting with python
 target_include_directories(scharm PUBLIC 
-#     "/usr/include/matplotlib-cpp" 
-#     "/usr/include/python3.8"
     "/usr/lib/python3.10/site-packages/numpy/core/include"
     )
-find_package(pybind11 REQUIRED)
-# list(APPEND CMAKE_MODULE_PATH "/usr/include/matplotlib-cpp/")
-
-
 
 if (UNIX)
     target_link_libraries(scharm  
@@ -97,18 +90,13 @@ if (UNIX)
         rt
         m
         dl
-        # Matplot++::matplot
+
         python3.10
         fftw3 # fft lib
         pybind11::embed
-        # pybind11
         pybind11::module
-        
         )
 endif (UNIX)
-
-# -I/usr/local/include/python2.7 
-# -I/usr/local/lib/python2.7/site-packages/numpy/core/include -lpython2.7
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

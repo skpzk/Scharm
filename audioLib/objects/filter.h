@@ -38,6 +38,7 @@ class BiquadFilter : public AudioObject{
     BiquadFilter();
 
     void setInput(AudioObject*);
+    void setEgInput(AudioObject*);
 
   private:
     double fc, maxFc, T;
@@ -54,6 +55,7 @@ class BiquadFilter : public AudioObject{
     
 
     AudioObject* input;
+    AudioObject* egInput;
     AudioDetector peakLimiter;
   
   protected:
@@ -80,6 +82,9 @@ class MFilter : public AudioObject{
     MFilter();
 
     void setInput(AudioObject*);
+    void setEgInput(AudioObject*);
+
+    void setEgAmount(float);
 
     void reset();
   private:
@@ -92,84 +97,26 @@ class MFilter : public AudioObject{
     double x11, x21, x31, x41;
     double G, K, alpha0, a0, a1, b1;
 
+    float egAmount;
+
+    double g, w0;
+
     void computeCoefs();
+    void computeCoefsInLoop(double);
 
     void updateQ(); //lpf
 
     AudioObject* input;
+    AudioObject* egInput;
 
     AudioDetector peakLimiter;
+
+    sample_t env[2*FRAMES_PER_BUFFER];
   
   protected:
     void filter(void*);
 
   friend Vcf;
-};
-
-class OnFilter : public AudioObject{
-  public:
-    void output(void*);
-
-    void setFc(float);
-
-    // lpf
-    void setQ(float);
-
-    // void setFilterType(FilterType);
-    OnFilter();
-
-    void setInput(AudioObject*);
-  protected:
-    double fc, maxFc, T;
-
-
-    double a0, y0=0;
-    
-
-    void computeCoefs();
-
-    AudioObject* input;
-  
-    void filter(void*);
-};
-
-class O1Filter : public OnFilter{
-  public:
-    O1Filter();
-    void output(void*);
-  protected:
-    void filter(void*);
-};
-
-class O2Filter : public OnFilter{
-  public:
-    O2Filter();
-    void output(void*);
-  protected:
-    void filter(void*);
-    double y1=0;
-};
-
-class O4Filter : public OnFilter{
-  public:
-    O4Filter();
-    void output(void*);
-  protected:
-    void filter(void*);
-    double y1=0;
-    double y2=0;
-    double y3=0;
-};
-
-class O4FdbFilter : public OnFilter{
-  public:
-    O4FdbFilter();
-    void output(void*);
-  protected:
-    void filter(void*);
-    double y1=0;
-    double y2=0;
-    double y3=0;
 };
 
 // class Vcf : public BiquadFilter{
@@ -179,6 +126,9 @@ class Vcf : public AudioObject{
     void output(void*);
     StateKeys stateKeys;
     void setInput(AudioObject*);
+
+    void setEgInput(AudioObject*);
+
   private:
     MFilter mFilter;
     BiquadFilter bqFilter;

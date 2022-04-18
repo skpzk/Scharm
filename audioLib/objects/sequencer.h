@@ -25,6 +25,9 @@ class Sequencer : public AudioObject{
     float steps[4];
     bool activeRhythms[4];
 
+    int reset;
+    bool next;
+
     sample_t clockSignal[2*FRAMES_PER_BUFFER];
     sample_t stepsSignal[2*FRAMES_PER_BUFFER];
 

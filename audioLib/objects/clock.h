@@ -30,6 +30,8 @@ class Clock: public AudioObject{
     void tick();
     void checkValues();
     float freq;
+    bool playing;
+    
     sample_t clockSignal[2*FRAMES_PER_BUFFER];
     sample_t risingEdgeSignal[2*FRAMES_PER_BUFFER];
 
@@ -68,6 +70,7 @@ class RhythmGenerator: public AudioObject{
   private:
     void tick();
     void checkValues();
+    bool reset;
 
     sample_t clockSignal[2*FRAMES_PER_BUFFER];
     sample_t risingEdgeSignal[2*FRAMES_PER_BUFFER];

@@ -62,6 +62,9 @@ Scharm::Scharm(){
     State::params("test")->call(10.);
 
     State::params("vco1.freq", 127); */
+}
+
+void Scharm::start(){
 
     Patch* patch = new Patch();
     

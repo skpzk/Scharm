@@ -9,6 +9,8 @@
 class Scharm{
 	public:
 		Scharm();
+
+		void start();
 		void close();
 		int test = 12;
 

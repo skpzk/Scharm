@@ -61,6 +61,7 @@ BUGS :
       Aborted (core dumped)
     No idea why.
     It may have been because I wasn't stopping the audio before. This is now done by the Scharm instance.
+    Not seen this bug since the above fix.
 
 
   - When two osc (typically two subs) have the same frequency, they can have opposite phases, thus cancelling each other
@@ -90,34 +91,34 @@ Improvement ideas:
 
 int app(int argc, char **argv){
   printf("Hello\n");
+  Scharm scharm;
 
   QApplication app(argc, argv);
 
-  Scharm scharm;
 
 	Window window;
   window.show();
 
   window.resize(QSize(950, 620));
 
+  scharm.start();
+
 	app.exec();
 
   // printf("app.exec closed\n");
 
   scharm.close();
-  return 1;
+  return 0;
 }
 
-// #include "design/filter.h"
-
-
-
+// #include "design/plotter.h"
 
 
 int main(int argc, char **argv) {
   app(argc, argv);
   // debug_plotter_spectrum();
-  
+  // debug_plotter_env();
+  // plotEnv();
   
   return 1;
 }

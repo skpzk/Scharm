@@ -26,6 +26,8 @@ QRadioButton(nullptr), text(text)
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     ID = id;
 
+    value = id;
+
     setMinimumWidth(10);
     setMinimumHeight(15);
 
@@ -39,6 +41,10 @@ QRadioButton(nullptr), text(text)
 
     connect(this, &QRadioButton::toggled, this, &Radio::warnState);
     
+}
+
+void Radio::setValue(int v){
+    value = v;
 }
 
 void Radio::computeSize(){
@@ -59,12 +65,12 @@ void Radio::warnState(int _){
     // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
     // # print("value = ", self.value())
     // cout << "warning state :\n";
-    // cout << "key = " << stateKey << ", value = " << (float) value() / maximum() << endl;
-    State::params(stateKey)->setValue((int) ID);
+    cout << "key = " << stateKey << ", value = " << (int) value << endl;
+    State::params(stateKey)->setValue((int) value);
 }
 
 void Radio::checkState(){
-    if(*State::params(stateKey) == ID){
+    if(*State::params(stateKey) == value){
         setChecked(true);
     }
 }

@@ -39,6 +39,15 @@ void Sequencer::checkValues(){
   //   printf("%i, ", activeRhythms[i]);
   // }
   // printf("\b\b]\n");
+
+  reset = (int) State::params("reset")->getValue();
+
+  bool tmpNext = (bool) State::params("next")->getValue();
+  if(tmpNext != next){
+    next = tmpNext;
+    if(next)
+      stepCounter = (stepCounter+1)%4;
+  }
 }
 
 void Sequencer::updateClockSignal(){
@@ -60,6 +69,7 @@ void Sequencer::updateClockSignal(){
     value = clockSignal[2*i];
 
     stepCounter = (value>0?(stepCounter + 1) % 4:stepCounter);
+    stepCounter = reset?0:stepCounter;
 
     // printf("stepcounter : %i\n", stepCounter);
     //debug
