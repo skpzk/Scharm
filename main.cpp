@@ -101,6 +101,8 @@ int app(int argc, char **argv){
 
   window.resize(QSize(950, 620));
 
+  window.patchbay->repaint();
+
   scharm.start();
 
 	app.exec();
@@ -114,11 +116,155 @@ int app(int argc, char **argv){
 // #include "design/plotter.h"
 
 
+#include <vector>
+
+// typedef struct{
+//   std::string name;
+//   int value;
+// }PpOut;
+
+// class PpOutVector : public std::vector<PpOut>{
+//   public:
+//     void set(std::string n, int v){
+//       for(int i=0;i<this->size();i++){
+//         if((*this)[i].name == n){
+//           (*this)[i].value = v;
+//           return;
+//         }
+//       }
+//     }
+
+//     int pop(std::string n){
+//       auto pos = this->begin();
+//       for(int i=0;i<this->size();i++){
+//         if((*this)[i].name == n){
+//           this->erase(this->begin() + i);
+//           return 0;
+//         }
+//       }
+//       return 1;
+//     }
+// };
+
+// void printPP(vector<double> pps){
+//   for(int i=0;i<pps.size();i++){
+//     cout << "pps["<<i<<"] = " << pps[i]<<endl;
+//   }
+// }
+// void printPP(PpOutVector pps){
+//   cout<<"Print pps: \n";
+//   for(int i=0;i<pps.size();i++){
+//     cout << "pps["<<i<<"] = " << pps[i].name<< ", " << pps[i].value<<endl;
+//   }
+// }
+// void testPp(){
+//   using namespace std;
+
+//   cout << "testing pp\n";
+
+//   // vector<double> test;
+//   // test.push_back(1);
+//   // test.push_back(1);
+//   // test.push_back(1);
+//   // test.push_back(1);
+
+//   // // test.erase(test[2]);
+//   // test[2].
+
+//   PpOut pp1;
+//   pp1.name = "test1";
+//   pp1.value = 0;
+
+//   PpOut pp2 = {"test2", 4};
+//   PpOut pp3 = {"test3", 6};
+
+//   PpOutVector ppv;
+//   ppv.push_back(pp1);
+//   ppv.push_back(pp2);
+//   ppv.push_back(pp3);
+
+//   printPP(ppv);
+
+//   ppv.set("test1", 2);
+//   printPP(ppv);
+
+//   ppv.pop("test2");
+//   printPP(ppv);
+// }
+
+
+#include "state/state.h"
+void testState(){
+  State::print();
+  State::params("")->setValue(10);
+  State::params("plop")->setValue(10);
+  State::params("connexions")->setValue(10);
+  State::params("connections")->setValue(10);
+  State::connections.print();
+  State::connections.connect("test", "test");
+  State::connections.connect("test", "test1");
+  State::connections.connect("test", "test2");
+  State::connections.connect("test2", "test");
+  State::connections.connect("test2", "test1");
+  State::connections.connect("test3", "test2");
+  State::connections.connect("", "test2");
+  State::connections.connect("test3", "");
+  State::connections.print();
+  State::connections.disconnect("test3", "test2");
+  State::connections.disconnect("test", "test1");
+  State::connections.disconnect("", "test2");
+  State::connections.disconnect("test", "");
+  // State::connections.print();
+
+  State::print();
+
+  State::save();
+}
+
+void testReadState(){
+  State::read();
+  State::print();
+
+
+}
+
+#include "gui/widgets/patchpoint.h"
+
+void testOverloadingEquality(int argc, char **argv){
+
+  // Must construct a QApplication before a QWidget
+  QApplication app(argc, argv);
+
+  Patchpoint * a, *b;
+
+  a = new Patchpoint(nullptr, "testa", "in");
+  b = new Patchpoint(nullptr, "testb", "in");
+
+  cout << "a==b : " << (*a==*b) << endl;
+
+  b = new Patchpoint(nullptr, "testa", "out");
+  cout << "a==b : " << (*a==*b) << endl;
+  
+  b = new Patchpoint(nullptr, "testa", "in");
+  cout << "a==b : " << (*a==*b) << endl;
+  
+  // b = new Patchpoint(nullptr, "testa", "in");
+  // cout << "a==b : " << (*a==*b) << endl;
+  
+}
+
 int main(int argc, char **argv) {
   app(argc, argv);
   // debug_plotter_spectrum();
   // debug_plotter_env();
   // plotEnv();
+
+  // testPp();
+
+  // testState();
+  // testReadState();
+
+  // testOverloadingEquality(argc, argv);
   
-  return 1;
+  return 0;
 }

@@ -9,6 +9,8 @@
 #include "../../audioApi/AudioConstants.h"
 #include "stateKeys.h"
 
+#include "patchbay.h"
+
 
 class Osc : public AudioObject{
 	public:
@@ -53,36 +55,48 @@ class Osc : public AudioObject{
 		virtual void updateFreq(int);
 
 		sample_t sequence[2*FRAMES_PER_BUFFER];
+		sample_t cvFreq[2*FRAMES_PER_BUFFER];
+
+		sample_t computedWave[2*FRAMES_PER_BUFFER];
 
 };
+
+enum vcoInputs {vcoIn_vco, vcoIn_sub, vcoIn_pwm};
 
 class Vco : public Osc{
 	public:
 		Vco();
 
 		void output(void*);
+		void CVOutput(void*);
 		int getWave();
 		float getFreq();
 
 		void setSequencer(AudioObject*);
 
 		void computeFreq(int);
+		
+
 	private:
 		void checkValues();
 
 		// gui values :
 		float knobFreq = 0;
+		float quantizedFreq = 0;
 		int quantValue;
 		int range;
 		
 		void updateFreq();
 		virtual void updateFreq(int );
 
+		
+
 
 	protected:
 		AudioObject * seq;
 		bool seqActive;
 		void updateWaveType(int);
+
 };
 
 class Sub : public Vco{

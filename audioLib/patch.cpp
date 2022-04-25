@@ -8,6 +8,9 @@
 #include "objects/clock.h"
 #include "objects/sequencer.h"
 #include "objects/env.h"
+#include "objects/patchbay.h"
+
+#include "../state/state.h"
 
 Patch::Patch(){
   Mixer *mixer = new Mixer;
@@ -184,6 +187,28 @@ Patch::Patch(){
 
   // vca->setEnv(clock);
 
+  Patchbay * patchbay = new Patchbay();
+
+  State::connections.setPatchbay(patchbay);
+
+  // patchbay->debug_addOutput(vca, &AudioObject::output);
+  patchbay->setOutput("vcaeg", vca, &AudioObject::altOutput);
+  patchbay->setOutput("vco1", vco1);
+  patchbay->setOutput("vco2", vco2);
+  patchbay->setOutput("vco1sub1", vco1sub1);
+  patchbay->setOutput("vco1sub2", vco1sub2);
+  patchbay->setOutput("vco2sub1", vco2sub1);
+  patchbay->setOutput("vco2sub2", vco2sub2);
+  patchbay->setOutput("vca", vca);
+
+  vco1->setCVInput(vcoIn_vco, patchbay->getInput("vco1"));
+  vco2->setCVInput(vcoIn_vco, patchbay->getInput("vco2"));
+
+  vca->setCVInput(vcaIn, patchbay->getInput("vca"));
+
+  // patchbay->connect("vco1", "vcaeg");
+
+  patchbay->checkState();
 
   this->outputObj = vca;
   this->masterClock = clock;

@@ -49,6 +49,10 @@ public:
 
     tuple<bool, Patchpoint*> isMouseReleaseOnPp(QPointF);
 
+    string getName();
+
+    bool operator==(const Patchpoint&);
+
 private:
 
     virtual void paintEvent(QPaintEvent*) override;

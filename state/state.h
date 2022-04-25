@@ -39,7 +39,7 @@ class Param;
  *   The param names are stored without spaces and in lowercase, but you can access them with spaces and uppercase, 
  *   they are removed when searching for the param in the param vector.
  * 
- * 
+ * 	 You can't use the name "connections" as a parameter name, it is reserved for the patchbay's connections.
  * 
  * - reading from a file
  *   // somewhere at the start of the program, this must be called to read from the default file:
@@ -52,7 +52,7 @@ class Param;
  *    State::params("name", floatValue);
  * 
  * - Reading a parameter
- *   // note that in both cases the parameter is created if not already existing
+ *   // note that in both cases the parameter is created if not already existing, and has a default value of 0
  *    float value = State::params("name")->getValue();  
  *   or
  *    float value = *State::params("name");
@@ -100,10 +100,42 @@ class Param;
  * 
  */
 
+#include "../audioLib/objects/patchbay.h"
+
+typedef struct{
+	std::string PpIn;
+	std::vector<std::string> PpOuts;
+}ConnectedPpOuts;
+
+class Connections{
+	public:
+		Connections();
+
+		void connect(std::string, std::string); // called by gui when an appropriate event occurs
+		void disconnect(std::string, std::string); // called by gui when an appropriate event occurs
+
+		void setPatchbay(Patchbay*); // set by audioPatch
+
+		void print(std::ofstream * out); // used by State to save to a file
+		void print(); // debug
+
+		std::vector<std::string> getConnectionsToPpIn(std::string); // called by gui at the start
+
+	private:
+		std::vector<ConnectedPpOuts> ppIns;
+		Patchbay * patchbay;
+
+		ConnectedPpOuts* findInPp(std::string *);
+
+};
+
 class State{
 	public:
 		// static vector<string> params;
 		static StateDict params;
+
+		static Connections connections;
+
 		// State();
 		static void read();
 		static void save();
@@ -144,7 +176,7 @@ class StateDict{
 
 	private:
 	  // this pointer is returned when trying to access a param with empty name
-		// it is not stored, and has a default value of 0
+		// it is not stored with the rest of the params, and has a default value of 0
 		Param * nullParam;
 
 		// vector of all params
@@ -154,7 +186,7 @@ class StateDict{
 		void setParam(std::string, float);
 
 		// find param
-		Param* findParam(std::string);
+		Param* findParam(std::string *);
 
 };
 
@@ -187,5 +219,6 @@ class Param{
 		
 		std::vector<CallbackFunction> callbacks;
 };
+
 
 #endif // STATE_H

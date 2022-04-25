@@ -60,6 +60,8 @@ public:
 
 private:
 
+    bool eventFilter(QObject*, QEvent*);
+
     virtual void paintEvent(QPaintEvent*) override;
 
     double knobRadius_;
@@ -91,6 +93,12 @@ private:
     knobType kType;
     int id;
 
+    float defaultValue = 0, tmpValue=0;
+    // bool muted = false;
+
+    void mute();
+
+
 public slots:
     void warnState(int);
     void repaintSlot();
@@ -100,6 +108,7 @@ signals:
     
 protected:
     void mousePressEvent(QMouseEvent *ev) override;
+    void mouseDoubleClickEvent(QMouseEvent *ev) override;
     void mouseMoveEvent(QMouseEvent *ev) override;
     void mouseReleaseEvent(QMouseEvent *ev) override;
     void mouseEvent(QMouseEvent *ev);

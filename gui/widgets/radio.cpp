@@ -65,7 +65,7 @@ void Radio::warnState(int _){
     // # mprint("key =", self._stateKey, "Statevalue = ", State.params[self._stateKey], "value = ", self.value(), "Warning state")
     // # print("value = ", self.value())
     // cout << "warning state :\n";
-    cout << "key = " << stateKey << ", value = " << (int) value << endl;
+    // cout << "key = " << stateKey << ", value = " << (int) value << endl;
     State::params(stateKey)->setValue((int) value);
 }
 

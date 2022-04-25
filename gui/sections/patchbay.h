@@ -10,18 +10,18 @@
 #include "../widgets/patchpoint.h"
 #include "../widgets/patchcordList.h"
 
-using namespace::std;
 
-class Patchbay : public QWidget{
+
+class GuiPatchbay : public QWidget{
     
     Q_OBJECT
     public:
-        explicit Patchbay(QWidget *parent = 0);
+        GuiPatchbay(QWidget *parent = 0);
         
         // QWidget *box;
         // QVBoxLayout *vbox;
 
-        string displayPp = "all";
+        std::string displayPp = "all";
 
         PatchCordList * pcs;
         void createPC(Patchpoint*);
@@ -31,9 +31,15 @@ class Patchbay : public QWidget{
 
         void movePC(PatchCord* pac, Patchpoint *pp);
 
+        void checkState();
+
     private:
-        vector<Patchpoint *> pps;
+        std::vector<Patchpoint *> pps;
         void resizePcs();
+
+        void connect(std::string inPp, std::string outPp);
+
+        std::vector<std::string> titlesIn;
 
 
     protected:

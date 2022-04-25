@@ -5,10 +5,25 @@ AudioObject::AudioObject(){
     defaultValue = 0;
 }
 
+AudioObject::AudioObject(sample_t df){
+    // AudioObject(0,0);
+    defaultValue = df;
+}
+
 void AudioObject::setDefaultValue(sample_t def){
     defaultValue = def;
 }
 
+void AudioObject::setCVInput(int index, PpIn* ppIn){
+    if(CVinputs.size()>index)
+        CVinputs[index] = ppIn;
+}
+
+void AudioObject::setNumberOfCVInputs(int n){
+  for(int i=0;i<3;i++){
+    CVinputs.push_back(nullptr);
+  }
+}
 // AudioObject::AudioObject(int nbCVInputs, int nbCVOutputs){
 //     defaultValue = 0;
 //     this->nbCVInputs = nbCVInputs;

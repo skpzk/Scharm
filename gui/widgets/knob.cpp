@@ -47,7 +47,7 @@ Knob::Knob(QWidget * parent,
     // trying this to prevent recursive repaint and segfaults
     connect(this, &Knob::repaintTitle, this, &Knob::repaintSlot);
 
-    debug_print_rects = true;
+    // debug_print_rects = true;
     debug_print_rects = false;
 
     // extent is the angle of the colored line around the knob, 
@@ -58,6 +58,8 @@ Knob::Knob(QWidget * parent,
 
     id = -1;
     kType = general;
+
+    this->installEventFilter(this);
 }
 
 void Knob::setKnobType(knobType kt){
@@ -127,6 +129,24 @@ QColor Knob::getRingColor() const{
     return QColor("black");
 }
 
+bool Knob::eventFilter(QObject *object, QEvent *ev)
+{
+    if (ev->type() == QEvent::KeyPress){
+        QKeyEvent* keyEvent = (QKeyEvent*)ev;
+
+        if(keyEvent->key() == Qt::Key_M){
+            mute();
+            return true;
+        }else if(keyEvent->key() == Qt::Key_Escape){
+            clearFocus();
+            return true;
+        }else{
+            // cout << "Key pressed : " << keyEvent->text().toStdString() <<"\n";
+        }
+        return false;
+    }return false;
+}
+
 void Knob::mousePressEvent(QMouseEvent* ev){
     if(distance(ev->pos(), this->center) < this->radius){
         mouseEvent(ev);
@@ -136,6 +156,20 @@ void Knob::mousePressEvent(QMouseEvent* ev){
         // printf("mouse outside of knob\n");
         ignoresMouse = true;
     }
+}
+
+void Knob::mute(){
+    if(value()==defaultValue){
+        setValue(tmpValue);
+    }else{
+        tmpValue = value();
+        setValue(defaultValue);
+    }
+}
+
+void Knob::mouseDoubleClickEvent(QMouseEvent* ev){
+    mute();
+    ev->accept();
 }
 
 void Knob::mouseMoveEvent(QMouseEvent* ev){
@@ -279,10 +313,10 @@ void Knob::paintEvent(QPaintEvent*){
 
     painter.setPen(pen);
     painter.setBrush(QColor(bgColor));
-    if(implementedKnobs.find(this->text_.toStdString()) == implementedKnobs.end()){
-        painter.setBrush(QBrush(QColor("#393939")));
-        // painter.setBrush(QBrush(QColor("red")));
-    }
+    // if(implementedKnobs.find(this->text_.toStdString()) == implementedKnobs.end()){
+    //     painter.setBrush(QBrush(QColor("#393939")));
+    //     // painter.setBrush(QBrush(QColor("red")));
+    // }
 
     float radius_inner = 15./20. * radius;
     painter.drawEllipse(QPointF(center_x, center_y), radius_inner, radius_inner);

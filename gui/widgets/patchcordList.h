@@ -8,6 +8,7 @@ using namespace::std;
 class PatchCordList;
 
 #include "patchcord.h"
+#include "patchpoint.h"
 
 class PatchCordList{
 
@@ -18,6 +19,8 @@ class PatchCordList{
         void remove(PatchCord*);
         PatchCord* last();
         bool is_empty();
+
+        bool duplicateExists(Patchpoint*, Patchpoint*);
 
         vector<PatchCord *> pcs;
     private:

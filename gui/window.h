@@ -21,7 +21,7 @@ class Window : public QMainWindow
     public:
         explicit Window(QWidget *parent = 0);
 
-        Patchbay *patchbay;
+        GuiPatchbay *patchbay;
     private:
         QWidget *createMainSection();
         QWidget *createTopControls();

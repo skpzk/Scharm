@@ -2,7 +2,11 @@
 #include "section.h"
 #include "../utils.h"
 
+#include "../../state/state.h"
+
 #include "../widgets/patchcord.h"
+
+#include "../../utils/utils.h"
 
 
 
@@ -12,25 +16,38 @@
 #include <QPainter>
 #include <QStyle>
 #include <QSize>
+#include <QLabel>
 
 #include <vector>
+#include <sstream>
 
-Patchbay::Patchbay(QWidget *parent):
+using namespace::std;
+
+GuiPatchbay::GuiPatchbay(QWidget *parent):
 QWidget(parent)
 {
     Section *section = new Section(parent, "Patchbay  ");
+
+    // cout << "patchbay instanciated\n";
 
     this->setLayout(section->vbox);
 
     QGridLayout *grid = new QGridLayout;
 
-    vector<string> titlesIn = {"VCO 1", "VCO 1 SUB", "VCO 1 PWM",
+    vector<string> titlesInTmp = {"VCO 1", "VCO 1 SUB", "VCO 1 PWM",
                 "VCA", "VCO 2", "VCO 2 SUB", "VCO 2 PWM",
                 "CUTOFF", "PLAY", "RESET", "TRIGGER",
                 // "CUTOFF", "RESET", "TRIGGER",
                 "RHYTHM 1", "RHYTHM 2", "RHYTHM 3", "RHYTHM 4",
                 "CLOCK",
                 "SEQ 1", "SEQ 2"};
+
+    for(int i=0;i<titlesInTmp.size();i++){
+        // cout << "pushing back " << titlesInTmp[i] << endl;
+        titlesIn.push_back(titlesInTmp[i]);
+    }
+
+    // cout << "length titlesIn : " << titlesIn.size() <<endl;
 
     vector<string> titlesOut = {"VCA", "VCO 1", "VCO 1 SUB 1", "VCO 1 SUB 2",
                     "VCA EG", "VCO 2", "VCO 2 SUB 1", "VCO 2 SUB 2",
@@ -49,8 +66,8 @@ QWidget(parent)
     
     for(int i=0; i<(titlesIndex.size() / 2); i++){
         for(int j=0; j<titlesIndex[2 * i]; j++){
-            titles.push_back(titlesIn[0]);
-            titlesIn.erase(titlesIn.begin());
+            titles.push_back(titlesInTmp[0]);
+            titlesInTmp.erase(titlesInTmp.begin());
             types.push_back("in");
         }
         for(int j=0; j<titlesIndex[2 * i + 1]; j++){
@@ -76,7 +93,16 @@ QWidget(parent)
         }
     }
 
+    std::stringstream labelText;
+
+    labelText << "<html><head/><body><p>IN / <span style=\" color:" << "black" << ";background-color:" << "white" << "\">OUT</span></p></body></html>";
+
+    QLabel *label = new QLabel(labelText.str().c_str());
+
+	label->setAlignment(Qt::AlignCenter);
+
     section->vbox->setStretch(0, 0);
+    section->vbox->addWidget(label);
     section->vbox->addLayout(grid, 1);
     /*
 
@@ -106,40 +132,92 @@ QWidget(parent)
     self.checkState()
     */
 
-   this->pcs = new PatchCordList;
+    this->pcs = new PatchCordList;
+
+    //check state
+    checkState();
     
 }
 
+void GuiPatchbay::checkState(){
+    // cout << "length titlesIn : " << titlesIn.size() <<endl;
+    for(auto inPp: titlesIn){
+        // cout << "inPp = " << inPp <<endl;
+        vector<string> outPps = State::connections.getConnectionsToPpIn(inPp);
+        for(auto outPp: outPps){
+            // cout << "connect("<<inPp<<", "<<outPp<<")\n";
+            connect(inPp, outPp);
+        }
+    }
+    displayPp = "all";
+    // connect("vco1", "vca");
+}
 
-void Patchbay::createPC(Patchpoint* pp){
+void GuiPatchbay::connect(string inPp, string outPp){
+    Patchpoint * ppIn=nullptr, * ppOut=nullptr;
 
-    cout << "Patchbay :: creating pc...\n";
+    lowerWithoutSpaces(&inPp);
+    lowerWithoutSpaces(&outPp);
+
+    string name;
+
+    for(auto pp:pps){
+        name = pp->getName();
+        if(name == inPp && pp->ioType == "in"){
+            ppIn = pp;
+        }else if(name == outPp && pp->ioType == "out"){
+            ppOut = pp;
+        }
+    }
+
+
+    if(ppIn!=nullptr && ppOut!=nullptr){
+        // cout<<"ppIn  coords : (" << ppIn->getCenter().x() << ", " << ppIn->getCenter().y() << ")\n";
+        // cout<<"ppOut coords : (" << ppOut->getCenter().x() << ", " << ppOut->getCenter().y() << ")\n";
+        createPC(ppIn);
+        pcs->last()->setEndPp(ppOut);
+        pcs->last()->connectPc();
+        pcs->last()->isHovered = false;
+
+        // pcs->last()->repaint();
+        repaint();
+    }
+}
+
+
+void GuiPatchbay::createPC(Patchpoint* pp){
+
+    // cout << "Patchbay::creating pc...\n";
 
     PatchCord *pc = new PatchCord(this);
 
-    cout << "setting points \n";
+    // cout << "setting points \n";
     pc->setStartPp(pp);
     pc->setPos(pp);
 
 
 
-    cout << "done\n";
+    // cout << "done\n";
 
     displayPp = pc->endPoint_io;
 
-    cout << "adding pc to list\n";
+    // cout << "adding pc to list\n";
     pcs->add(pc);
 
-    cout << "PC created\n";
+    // cout << "PC created\n";
 }
 
-void Patchbay::moveLastPC(QPointF pos){
+void GuiPatchbay::moveLastPC(QPointF pos){
+    // cout << "patchbay::moveLastPC\n";
+    // cout << "length pcs : " << pcs->pcs.size() << endl;
+    // cout << "pos = (" << pos.x() << ", " << pos.y() << ")\n";
+    
     pcs->last()->setPos(pos);
     // # print(type(pos))
     repaint();
 }
 
-void Patchbay::disposeOfLastPc(){
+void GuiPatchbay::disposeOfLastPc(){
     PatchCord *pc = pcs->last();
     pcs->remove(pc);
     pc->deleteFromPpLists();
@@ -147,7 +225,7 @@ void Patchbay::disposeOfLastPc(){
     displayPp = "all";
 }
 
-void Patchbay::findReleasePp(QPointF pos){
+void GuiPatchbay::findReleasePp(QPointF pos){
 
     bool isPpFound = false;
     Patchpoint *pprelease = nullptr;
@@ -164,6 +242,8 @@ void Patchbay::findReleasePp(QPointF pos){
     }else{
         if(pprelease->ioType != pcs->last()->endPoint_io){
             disposeOfLastPc();
+        }else if(pcs->duplicateExists(pcs->last()->getStartPp(), pprelease)){
+            disposeOfLastPc();
         }else{
             pcs->last()->setEndPp(pprelease);
             pcs->last()->connectPc();
@@ -175,27 +255,30 @@ void Patchbay::findReleasePp(QPointF pos){
     repaint();
 }
 
-void Patchbay::movePC(PatchCord* pc, Patchpoint *pp){
+void GuiPatchbay::movePC(PatchCord* pc, Patchpoint *pp){
     pcs->add(pc);
     pcs->last()->disconnectPc(pp);
     displayPp = pcs->last()->endPoint_io;
     repaint();
 }
 
-void Patchbay::resizeEvent(QResizeEvent* event){
+void GuiPatchbay::resizeEvent(QResizeEvent* event){
+    // cout << "patchbay::resizeEvent triggered\n";
     resizePcs();
 }
 
-void Patchbay::resizePcs(){
+void GuiPatchbay::resizePcs(){
+    // cout << "patchbay::resizePcs triggered\n";
     for(int i=0; i<pcs->pcs.size(); i++){
         // cout << "Patchbay : pc[" << i << "]->isHovered = " << pcs->pcs[i]->isHovered << endl;
-        // cout << "No bug so far" << endl;
         // cout << "size = " << size().width() << ", " << size().height() << endl;
         pcs->pcs[i]->resize(this->size());
     }
 }
 
-void Patchbay::paintEvent(QPaintEvent *ev){
+void GuiPatchbay::paintEvent(QPaintEvent *ev){
+
+    // cout<< "patchbay::paintEvent called\n";
 
     QStyleOption opt = QStyleOption();
     opt.initFrom(this);

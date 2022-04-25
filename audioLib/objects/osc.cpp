@@ -104,6 +104,11 @@ void Osc::outputWave(void* outputBuffer){
         // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
         // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
         *out++ += value  * this->volume ;  // right
+
+        computedWave[2*i] = value*volume;
+        computedWave[2*i+1] = value*volume;
+
+
         updateFreq(i);
         this->phase += (this->phaseIncrement);
         if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
@@ -126,6 +131,10 @@ void Osc::outputWave(void* outputBuffer){
         // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
         // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
         *out++ += value  * this->volume ;  // right
+
+        computedWave[2*i] = value*volume;
+        computedWave[2*i+1] = value*volume;
+
         updateFreq(i);
         this->phase += (this->phaseIncrement);
         if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
@@ -160,6 +169,10 @@ void Osc::outputWave(void* outputBuffer){
         // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
         // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
         *out++ += value  * this->volume ;  // right
+
+        computedWave[2*i] = value*volume;
+        computedWave[2*i+1] = value*volume;
+
         updateFreq(i);
         this->phase += (this->phaseIncrement);
         if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
@@ -180,6 +193,10 @@ void Osc::outputWave(void* outputBuffer){
         }
         *out++ += this->wave.wave[(int)this->phase] * this->volume;  // mono/left
         *out++ += this->wave.wave[(int)this->phase] * this->volume;  // right
+
+        computedWave[2*i] = this->wave.wave[(int)this->phase]*volume;
+        computedWave[2*i+1] = this->wave.wave[(int)this->phase]*volume;
+
         updateFreq(i);
         this->phase += (this->phaseIncrement);
         if( this->phase >= TABLE_SIZE ) this->phase -= TABLE_SIZE;
@@ -203,6 +220,9 @@ Osc(){
   vco_or_sub = 0;
   range = 1;
   seq = new AudioObject();
+
+  setNumberOfCVInputs(3);
+
 }
 
 void Vco::setSequencer(AudioObject * s){
@@ -259,18 +279,22 @@ void Vco::updateFreq(){
   // quantize freq
   quantizeFloat(&this->freq, quantValue);
 
-
+  quantizedFreq = freq;
   // setFreq(knobFreq);
   updatePhaseIncrement();
 }
 
 void Vco::computeFreq(int i){
-  this->freq = mtof(((double)sequence[2*i])/127. * range * 12 + ftom(knobFreq));
+  // this->freq = trim(mtof(((double)sequence[2*i])/127. * range * 12 + ftom(this->freq)), 22000);
+  // printf("ftom(freq) = %f, ftom(knobFreq) = %f\n", ftom(freq), ftom(knobFreq));
 
+  this->freq = trim(mtof(((double)sequence[2*i])/127. * range * 12 + (((double)cvFreq[2*i] )/ MAX *12*5) + ftom(quantizedFreq)), 22000);
+
+  // printf("cv midi = %f\n", (((double)cvFreq[2*i] )/ MAX *12*5));
   // printf("freq = %f\n", freq);
 
   // quantize freq
-  quantizeFloat(&this->freq, quantValue);
+  // quantizeFloat(&this->freq, quantValue);
 }
 
 void Vco::updateFreq(int i){
@@ -305,6 +329,10 @@ void Vco::output(void* outputBuffer){
   if(seqActive)
     seq->output((void*) sequence);
 
+  initBuffer(cvFreq);
+  if(CVinputs[vcoIn_vco]!=nullptr)
+    CVinputs[vcoIn_vco]->output((void*) cvFreq);
+
   updateFreq();
 
   
@@ -325,6 +353,13 @@ void Vco::output(void* outputBuffer){
 
 }
 
+void Vco::CVOutput(void* outputBuffer){
+  sample_t * out = (sample_t*) outputBuffer;
+  for(int i=0; i<FRAMES_PER_BUFFER; i++){
+    *out++ += computedWave[2*i];  // mono/left
+    *out++ += computedWave[2*i+1];  // right
+  }
+}
 Sub::Sub() :
 Vco(){
   vco_or_sub = 1;

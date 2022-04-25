@@ -20,7 +20,7 @@
 Window::Window(QWidget *parent) :
 QMainWindow(parent)
 {
-    printf("Window\n");
+    // printf("Window\n");
     //create filter for events
     this->installEventFilter(this);
 
@@ -31,7 +31,8 @@ QMainWindow(parent)
 
     layout->setStretch(0, 580);
 
-    patchbay = new Patchbay;
+    patchbay = new GuiPatchbay(this);
+    // patchbay->checkState();
     layout->addWidget(patchbay);
 
     layout->setStretch(1, 280);
@@ -43,6 +44,8 @@ QMainWindow(parent)
     centralWidget->setLayout(layout);
 
     setStyleSheet(mainWindowStyleSheet());
+
+    
 
     this->setWindowTitle("Scharm");
     // path = join("gui", "images", "icon.svg")
@@ -62,7 +65,7 @@ bool Window::eventFilter(QObject *object, QEvent *ev)
             QApplication::quit();
             // std::raise(SIGINT);
         }else{
-            cout << "Key pressed : " << keyEvent->text().toStdString() <<"\n";
+            // cout << "Key pressed : " << keyEvent->text().toStdString() <<"\n";
         }
     }
     return false;

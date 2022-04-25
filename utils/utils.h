@@ -4,11 +4,13 @@
 #include <string>
 #include <vector>
 
-using namespace::std;
+// using namespace::std;
 
-string replace(string base, string oldValue, string newValue);
-string replaceAll(string base, string oldValue, string newValue);
-vector<string> split(string stringToBeSplitted, string delimeter);
-void lowerWithoutSpaces(string*);
+std::string replace(std::string base, std::string oldValue, std::string newValue);
+std::string replaceAll(std::string base, std::string oldValue, std::string newValue);
+std::vector<std::string> split(std::string stringToBeSplitted, std::string delimeter);
+void lowerWithoutSpaces(std::string*);
+void removeBrackets(std::string*);
+void removeChar(std::string*, const char*);
 
 #endif // UTILS_H

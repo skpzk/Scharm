@@ -1,5 +1,5 @@
-#ifndef PATCHCORD_H
-#define PATCHCORD_H
+#ifndef WIDGETS_PATCHCORD_H
+#define WIDGETS_PATCHCORD_H
 
 #include <QWidget>
 #include <QPointF>
@@ -30,6 +30,9 @@ class PatchCord: public QWidget{
         void setStartPp(Patchpoint*);
         void setEndPp(Patchpoint*);
 
+        Patchpoint* getStartPp();
+        Patchpoint* getEndPp();
+
         string endPoint_io = "";
 
         bool isHovered;
@@ -39,7 +42,7 @@ class PatchCord: public QWidget{
 
         void deleteFromPpLists();
 
-        // void resize(QSize);
+        void resize(QSize);
 
     private:
         QPointF startPoint, endPoint;
@@ -55,9 +58,9 @@ class PatchCord: public QWidget{
         
 
         virtual void paintEvent(QPaintEvent*) override;
-        void resizeEvent(QPaintEvent*);
+        void resizeEvent(QResizeEvent*);
 
         void get_start_and_end_points();
 };
 
-#endif // PATCHCORD_H
+#endif /* WIDGETS_PATCHCORD_H */

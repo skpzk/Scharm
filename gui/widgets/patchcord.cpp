@@ -10,6 +10,8 @@
 
 #include "../utils.h"
 
+#include "../../state/state.h"
+
 vector<string> pcColors = {"#009acd",
                      "#cd0000",
                      "#ee2c2c",
@@ -69,9 +71,12 @@ QWidget(parent){
     endPoint = QPointF(0, 0);
     isHovered = true;
 
+    startPp = nullptr;
+    endPp = nullptr;
+
     float testConstructor = QWidget::height();
 
-    cout << "colors length = " << PatchCord::colors.size() << endl;
+    // cout << "colors length = " << PatchCord::colors.size() << endl;
 
     if(PatchCord::colors.size() == 0){
         // PatchCord::colors = pcColors.copy();
@@ -85,7 +90,7 @@ QWidget(parent){
     this->raise();
     this->show();
 
-    cout << "pc created\n";
+    // cout << "pc created\n";
 }
 
 void PatchCord::setPos(Patchpoint* pp){
@@ -94,6 +99,7 @@ void PatchCord::setPos(Patchpoint* pp){
 }
 void PatchCord::setPos(QPointF pp){
     endPoint = pp;
+    // resize();
     repaint();
 }
 void PatchCord::setStartPp(Patchpoint* pp){
@@ -108,6 +114,15 @@ void PatchCord::setStartPp(Patchpoint* pp){
     }
     repaint();
 }
+
+Patchpoint* PatchCord::getStartPp(){
+    return startPp;
+}
+
+Patchpoint* PatchCord::getEndPp(){
+    return endPp;
+}
+
 void PatchCord::setEndPp(Patchpoint* pp){
     endPoint = pp->getCenter();
     endPp = pp;
@@ -122,26 +137,35 @@ void PatchCord::connectPc(){
     inPp->pcs->add(this);
     outPp->pcs->add(this);
     // Warn state !!
+
+    State::connections.connect(inPp->getName(), outPp->getName());
 }
 void PatchCord::disconnectPc(Patchpoint* pp){
     // Warn state !!
+    State::connections.disconnect(inPp->getName(), outPp->getName());
+
     if(pp->ioType == "out"){
-        endPp = outPp;
-        endPoint = outPp->getCenter();
+        // endPp = outPp;
+        // endPoint = outPp->getCenter();
+
+        endPp = nullptr;
 
         startPp = inPp;
         startPoint = inPp->getCenter();
 
         outPp = nullptr;
     }else{
-        endPp = inPp;
-        endPoint = inPp->getCenter();
+        // endPp = inPp;
+        // endPoint = inPp->getCenter();
+
+        endPp = nullptr;
 
         startPp = outPp;
         startPoint = outPp->getCenter();
 
         inPp = nullptr;
     }
+    
     endPoint_io = pp->ioType;
     repaint();
 }
@@ -192,9 +216,18 @@ def setPoints(self, **kwargs):
 //     // get_start_and_end_points();
 // }
 
-void PatchCord::resizeEvent(QPaintEvent* ev){
-    cout << "Pc::resizeEvent called !\n";
+void PatchCord::resize(QSize _){
+    // resizeEvent(nullptr);
+    QWidget::resize(_);
     get_start_and_end_points();
+}
+
+void PatchCord::resizeEvent(QResizeEvent* ev){
+    // cout << "Pc::resizeEvent called !\n";
+    get_start_and_end_points();
+    // cout<<"startPp  coords : (" << startPp->getCenter().x() << ", " << startPp->getCenter().y() << ")\n";
+    // cout<<"endPp coords    : (" << endPp->getCenter().x() << ", " << endPp->getCenter().y() << ")\n";
+    QWidget::resizeEvent(ev);
 }
 
 void PatchCord::get_start_and_end_points(){
@@ -238,6 +271,7 @@ void PatchCord::paintEvent(QPaintEvent*){
         // cout << "end != start\n";
         path.cubicTo(c1, c2, endPoint);
         // cout << "startpoint = (" << startPoint.x() << ", " << startPoint.y() << ")" << endl;
+        // cout << "endPoint   = (" << endPoint.x() << ", " << endPoint.y() << ")" << endl;
         // cout << "m          = (" << m.x() << ", " << m.y() << ")" << endl;
         // cout << "c1         = (" << c1.x() << ", " << c1.y() << ")" << endl;
         // cout << "c2         = (" << c2.x() << ", " << c2.y() << ")" << endl;
@@ -265,7 +299,19 @@ void PatchCord::paintEvent(QPaintEvent*){
     // p.setPen(QPen(QColor("red"), 11));
     p.drawPath(path);
 
-//    p.drawRect(QRectF(startPoint.x(), startPoint.y(), 100, 100));
+    // p.drawRect(QRectF(startPoint.x(), startPoint.y(), 100, 100));
+    // p.drawRect(QRectF(startPoint, endPoint));
+
+
+    // p.setPen(QColor("red"));
+    // p.setBrush(QColor("red"));
+
+    // p.drawRect(QRectF(this->x(), 0, 3000, 3000));
+    // cout << "this->x() = "<<this->x()<<endl;
+    // cout << "this->y() = "<<this->y()<<endl;
+    // cout << "this->width() = "<<this->width()<<endl;
+    // cout << "this->height() = "<<this->height()<<endl;
+
 
 
 

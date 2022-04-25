@@ -60,6 +60,7 @@ set(SOURCES
     audioLib/objects/vca.cpp
     audioLib/objects/sequencer.cpp
     audioLib/objects/env.cpp
+    audioLib/objects/patchbay.cpp
 
     audioLib/utils/SignalUtils.cpp
     audioLib/utils/midi.cpp

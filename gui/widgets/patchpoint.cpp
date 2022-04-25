@@ -10,7 +10,12 @@
 #include "../sections/patchbay.h"
 #include "../utils.h"
 
-std::set<std::string> implementedPps = {};
+#include "../../utils/utils.h"
+
+std::set<std::string> implementedPps = {
+	"VCA EG", "VCA",
+	"VCO 1", "VCO 1 SUB 1", "VCO 1 SUB 2", 
+	"VCO 2", "VCO 2 SUB 1", "VCO 2 SUB 2"};
 
 Patchpoint::Patchpoint(QWidget * parent,
     const QString& text, string ioType): 
@@ -39,6 +44,12 @@ QWidget(parent),
 
 	setMouseTracking(true);
 
+}
+
+string Patchpoint::getName(){
+	string name = text_.toStdString();
+	lowerWithoutSpaces(&name);
+	return name;
 }
 
 void Patchpoint::setFixedSize(float size){
@@ -101,17 +112,19 @@ void Patchpoint::mousePressEvent(QMouseEvent *ev){
 	if((this->pcs->is_empty()) || (ev->modifiers() == Qt::ControlModifier)){
 		// cout << "Pb crate pc\n";
 
-		Patchbay *parent = (Patchbay*) this->parent();
+		GuiPatchbay *parent = (GuiPatchbay*) this->parent();
 		parent->createPC(this);
 
 		hasPcGrabbed = true;
 	}else if(!(this->pcs->is_empty())){
 		// elif self has a pc, disconnect it from self
 
+		// cout << "removing pc\n";
+
 		PatchCord *pc = pcs->last();
 		pcs->remove(pc);
 
-		Patchbay *parent = (Patchbay*) this->parent();
+		GuiPatchbay *parent = (GuiPatchbay*) this->parent();
 		parent->movePC(pc, this);
 
 		hasPcGrabbed = true;
@@ -133,7 +146,7 @@ void Patchpoint::mouseMoveEvent(QMouseEvent *ev){
 	// cout << "mouse move detected :" << text_.toStdString() << endl;
 	if(ev->buttons() == Qt::LeftButton && hasPcGrabbed){
 		// send mouse position to pb
-		Patchbay *parent = (Patchbay*) this->parent();
+		GuiPatchbay *parent = (GuiPatchbay*) this->parent();
 		parent->moveLastPC(this->mapToParent(ev->pos()));
 	}else{
 		// set pc to hovered if the mouse in on the pp
@@ -144,7 +157,7 @@ void Patchpoint::mouseMoveEvent(QMouseEvent *ev){
 void Patchpoint::mouseReleaseEvent(QMouseEvent *ev){
 	if(hasPcGrabbed){
 		hasPcGrabbed = false;
-		Patchbay *parent = (Patchbay*) this->parent();
+		GuiPatchbay *parent = (GuiPatchbay*) this->parent();
 		// parent->moveLastPC(this->mapToParent(ev->pos()));
 		parent->findReleasePp(this->mapToParent(ev->pos()));
 	}
@@ -203,6 +216,11 @@ QPolygonF Patchpoint::createPoly(int n_points, float radius, float center_x, flo
 	return polygon;
 }
 
+bool Patchpoint::operator==(const Patchpoint& rhs){
+	return (text_ == rhs.text_) && (ioType == rhs.ioType);
+	// return true;
+}
+
 void Patchpoint::paintEvent(QPaintEvent* event){
 	this->computeCenter();
 	float center_x = center.x();
@@ -224,9 +242,9 @@ void Patchpoint::paintEvent(QPaintEvent* event){
 	// self.pointColor = pointColor
 	// self.bgColor = textBgColor
 
-	int alpha = 150;
+	int alpha = 100;
 
-	Patchbay *parent = (Patchbay*) this->parent();
+	GuiPatchbay *parent = (GuiPatchbay*) this->parent();
 
 	if((parent->displayPp == "all") || (parent->displayPp == this->ioType)){
 		pointColor.setAlpha(255);
@@ -244,6 +262,7 @@ void Patchpoint::paintEvent(QPaintEvent* event){
 	QRectF textRect = QRectF(0, center_y_pp - mainRadius - 2 * fontsize, width, 2 * fontsize);
 	QFont f = painter.font();
 	f.setPointSizeF(fontsize);
+	painter.setPen(QPen(pointColor));
 
 	// self._io = 'in'
 	if(ioType == "out"){

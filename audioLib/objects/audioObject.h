@@ -4,9 +4,14 @@
 #include <vector>
 #include "../../audioApi/AudioConstants.h"
 
+class AudioObject;
+
+#include "patchbay.h"
+
 class AudioObject{
     public:
         AudioObject();
+        AudioObject(sample_t);
         // AudioObject(int nbCVInputs, int nbCVOutputs);
         virtual void output(void*);
         // this is not really satisfying to have to set yet another output
@@ -15,11 +20,15 @@ class AudioObject{
         virtual void CVOutput(void*);
         virtual void update();
         void setDefaultValue(sample_t);
+
+        void setNumberOfCVInputs(int);
+        void setCVInput(int, PpIn*);
+        
     protected:
         sample_t defaultValue;
         // int nbCVInputs, nbCVOutputs;
 
-        std::vector<AudioObject*> CVinputs;
+        std::vector<PpIn*> CVinputs;
 };
 
 

@@ -1,4 +1,10 @@
 #include "fileio.h"
+#include "utils.h"
+
+using namespace::std;
+namespace fs = std::filesystem;
+
+#include <vector>
 
 void getConfigurationFromFile(fs::path loadPath){
 
@@ -36,9 +42,29 @@ void getConfigurationFromFile(fs::path loadPath){
 					// TODO : check if paramName is not empty
 					try {
 						if(!paramName.empty()){
-							// convert value from string to float
-							float value = stof(paramValue);
-							State::params(paramName)->setValue(value);
+
+							if(paramName == "connections"){
+								vector<string> connections = split(paramValue, "]");
+								for(string c: connections){
+									vector<string> cList = split(c, ":");
+									if(cList.size()>1){
+										string inPp = split(c, ":").at(0);
+										removeBrackets(&inPp);
+										vector<string> outList = split(split(c, ":").at(1), ",");
+										for(string outPp: outList){
+											removeBrackets(&outPp);
+											removeChar(&outPp, ",");
+											// cout << "connect("<<inPp<<", "<<outPp<<");\n";
+											State::connections.connect(inPp, outPp);
+										}
+									}
+								}
+							}else{
+
+								// convert value from string to float
+								float value = stof(paramValue);
+								State::params(paramName)->setValue(value);
+							}
 						}
 					}
 					catch (const std::invalid_argument& e) {
