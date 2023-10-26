@@ -21,8 +21,8 @@ typedef int   sample_t;
 #define SINE     (0)
 #define TRI      (1)
 #define SAW      (2)
+#define SAW_PWM  (3)
 #define SQR      (4)
-#define PURE_SQR (10)
 
 
 #endif

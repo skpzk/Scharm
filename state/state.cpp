@@ -164,6 +164,12 @@ void Param::setValue(float value_){
     call(value);
 }
 
+void Param::setValue(vector<float> value_){
+    // printf("Set value for oscillo\n");
+    value = value_.at(0);
+    call(value_);
+}
+
 float Param::getValue(){
     return value;
 }
@@ -182,11 +188,23 @@ void Param::call(float v){
     }
 }
 
+void Param::call(vector<float> v){
+    for(int i=0; i<this->callbacksV.size(); i++){
+        callbacksV[i].callback(callbacksV[i].p, v);
+    }
+}
+
 void Param::attachCallback(void* p_, function<void(void*, float)> f){
     CallbackFunction cf;
     cf.callback = f;
     cf.p = p_;
     this->callbacks.push_back(cf);
+}
+void Param::attachCallback(void* p_, function<void(void*, vector<float>)> f){
+    CallbackFunctionVector cf;
+    cf.callback = f;
+    cf.p = p_;
+    this->callbacksV.push_back(cf);
 }
 
 Connections::Connections(){

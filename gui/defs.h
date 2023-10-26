@@ -25,6 +25,7 @@ class Theme{
             buttonBackground, 
             pointColor,
             activeColor,
+            activeColorTamed,
             inactiveColor, 
             barsColor, 
 	        sectionLabelColor,

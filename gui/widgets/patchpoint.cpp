@@ -15,7 +15,8 @@
 std::set<std::string> implementedPps = {
 	"VCA EG", "VCA",
 	"VCO 1", "VCO 1 SUB 1", "VCO 1 SUB 2", 
-	"VCO 2", "VCO 2 SUB 1", "VCO 2 SUB 2"};
+	"VCO 2", "VCO 2 SUB 1", "VCO 2 SUB 2",
+	"NOISE", "VCO 1 SUB", "VCO 2 SUB", "VCO 1 PWM", "VCO 2 PWM"};
 
 Patchpoint::Patchpoint(QWidget * parent,
     const QString& text, string ioType): 
@@ -287,12 +288,19 @@ void Patchpoint::paintEvent(QPaintEvent* event){
 
 	// draw outer circle
 	float radius_outer = mainRadius * .8;
+	// std::cout << this->text_.toStdString() << endl;
+	// std::cout << (implementedPps.find(this->text_.toStdString()) == implementedPps.end()) << std::endl;
 	if(implementedPps.find(this->text_.toStdString()) == implementedPps.end()){
 		painter.setBrush(QBrush(QColor("#999999")));
 	}
 	painter.drawEllipse(QPointF(center_x, center_y_pp), radius_outer, radius_outer);
 
 	// draw inner circle
+	
+	if(implementedPps.find(this->text_.toStdString()) == implementedPps.end()){
+		painter.setBrush(QBrush(QColor("#111111")));
+	}
+	
 	float radius_inner = mainRadius * .5;
 	// painter.setBrush(QBrush(pointColor))
 	// painter.setBrush(QColor(ppColor));

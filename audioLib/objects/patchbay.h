@@ -1,8 +1,8 @@
 #ifndef OBJECTS_PATCHBAY_H
 #define OBJECTS_PATCHBAY_H
 
-#define PPOUTLENGTH 16
-#define PPINLENGTH 18
+#define PPOUTLENGTH 18
+#define PPINLENGTH 19
 
 class PpIn;
 #include "audioObject.h"
@@ -18,8 +18,8 @@ typedef struct{
 
 // well, this is nice and all, but not very useful
 enum ppOutNames {
-  ppo_vco1, ppo_vco2, ppo_vco1sub1, ppo_vco1sub2, ppo_vco2sub1, 
-  ppo_vco2sub2, ppo_vca, ppo_vcaeg, ppo_seq1, ppo_seq2, 
+  ppo_vco1, ppo_vco2, ppo_vco1sub1, ppo_vco1sub1_normalled, ppo_vco1sub2, ppo_vco2sub1, 
+  ppo_vco2sub1_normalled, ppo_vco2sub2, ppo_vca, ppo_vcaeg, ppo_seq1, ppo_seq2, 
   ppo_vcfeg, ppo_noise, ppo_sh, ppo_clock, ppo_seq1clk, 
   ppo_seq2clk};  // 16 names
 
@@ -48,10 +48,14 @@ class PpIn{
     void connect(PpOut*);
     void disconnect(PpOut*);
 
-  private:
+    void setDefaultConnection(PpOut*);
 
+  private:
+    bool hasDefaultConnection=false;
     bool blockDisconnect=false;
     PpOutVector ppOutVector;
+
+    PpOut * defaultPpOut = nullptr;
 
 };
 
@@ -67,6 +71,8 @@ class Patchbay{
 
     void setOutput(std::string, AudioObject*, void (AudioObject::*)(void*));
     void setOutput(std::string, AudioObject*);
+
+    void setDefaultConnection(std::string inPp, std::string outPp);
 
     PpIn* getInput(std::string);
 

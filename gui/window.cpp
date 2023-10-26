@@ -13,8 +13,11 @@
 #include "sections/rhythm.h"
 #include "sections/vcos.h"
 
+#include "sections/oscillo.h"
+
 #include "widgets/radio.h"
 #include "defs.h"
+
 
 
 Window::Window(QWidget *parent) :
@@ -34,8 +37,12 @@ QMainWindow(parent)
     patchbay = new GuiPatchbay(this);
     // patchbay->checkState();
     layout->addWidget(patchbay);
-
     layout->setStretch(1, 280);
+
+    oscillo = new OscilloSection(this);
+    layout->addWidget(oscillo);
+    layout->setStretch(2, 280);
+
     
     layout->setSpacing(8);
 
@@ -44,6 +51,8 @@ QMainWindow(parent)
     centralWidget->setLayout(layout);
 
     setStyleSheet(mainWindowStyleSheet());
+
+    
 
     
 

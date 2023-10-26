@@ -10,9 +10,13 @@
 #include "objects/env.h"
 #include "objects/patchbay.h"
 
+#include "objects/noise.h"
+
 #include "../state/state.h"
 
 Patch::Patch(){
+
+  setNumberOfCVInputs(1);
   Mixer *mixer = new Mixer;
 
   Vco *vco1 = new Vco;
@@ -196,22 +200,41 @@ Patch::Patch(){
   patchbay->setOutput("vco1", vco1);
   patchbay->setOutput("vco2", vco2);
   patchbay->setOutput("vco1sub1", vco1sub1);
+  patchbay->setOutput("vco1sub1_normalled", vco1sub1, &AudioObject::altOutput);
   patchbay->setOutput("vco1sub2", vco1sub2);
   patchbay->setOutput("vco2sub1", vco2sub1);
+  patchbay->setOutput("vco2sub1_normalled", vco2sub1, &AudioObject::altOutput);
   patchbay->setOutput("vco2sub2", vco2sub2);
   patchbay->setOutput("vca", vca);
 
   vco1->setCVInput(vcoIn_vco, patchbay->getInput("vco1"));
+  vco1->setCVInput(vcoIn_sub, patchbay->getInput("vco1sub"));
+  vco1->setCVInput(vcoIn_pwm, patchbay->getInput("vco1pwm"));
   vco2->setCVInput(vcoIn_vco, patchbay->getInput("vco2"));
+  vco2->setCVInput(vcoIn_sub, patchbay->getInput("vco2sub"));
+  vco2->setCVInput(vcoIn_pwm, patchbay->getInput("vco2pwm"));
+
+  patchbay->setDefaultConnection("vco1pwm", "vco1sub1_normalled");
+  patchbay->setDefaultConnection("vco2pwm", "vco2sub1_normalled");
 
   vca->setCVInput(vcaIn, patchbay->getInput("vca"));
 
+  this->setCVInput(oscillo, patchbay->getInput("oscillo"));
+  this->stateKeys.guiCallback = "oscillo";
+
   // patchbay->connect("vco1", "vcaeg");
+
+  NoiseGenerator * noise = new NoiseGenerator();
+
+  patchbay->setOutput("noise", noise);
 
   patchbay->checkState();
 
   this->outputObj = vca;
   this->masterClock = clock;
+
+  this->utils = new AudioObject*[utilsNumber];
+  this->utils[0] = noise;
 }
 
 void Patch::output(void* out){
@@ -221,5 +244,22 @@ void Patch::output(void* out){
 
 void Patch::update(){
   this->masterClock->update();
+  for(int i=0;i<utilsNumber;i++){
+    this->utils[i]->update();
+  }
 
+  initBuffer(audio);
+
+  if(CVinputs[oscillo]!=nullptr){
+    counter ++;
+    if(counter >=10){
+      CVinputs[oscillo]->output((void*) audio);
+      std::vector<float> audioVector;
+      for(int i=0;i<2*FRAMES_PER_BUFFER;i++){
+        audioVector.push_back(((float)audio[i])/((float) (1<<27)));
+      }
+      State::params(stateKeys.guiCallback)->setValue(audioVector);
+      counter = 0;
+    }
+  }
 }

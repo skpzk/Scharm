@@ -100,6 +100,11 @@ QWidget(parent)
     QLabel *label = new QLabel(labelText.str().c_str());
 
 	label->setAlignment(Qt::AlignCenter);
+    QFont font = label->font();
+    
+    font.setPointSize(.75 * font.pointSize()); 
+
+    label->setFont(font);
 
     section->vbox->setStretch(0, 0);
     section->vbox->addWidget(label);

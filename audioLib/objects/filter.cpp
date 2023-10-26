@@ -132,6 +132,8 @@ MFilter::MFilter(){
   this->reset();
 
   this->egInput = new AudioObject;
+
+  // K is updated by Vcf::checkValues() > MFilter::setQ() > MFilter::computeCoefs()
 }
 
 void MFilter::setFc(float fc){

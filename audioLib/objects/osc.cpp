@@ -11,25 +11,27 @@ AudioObject()
   this->setFreq(440);
   this->volume = 1;
   this->phase = 0;
-  this->vco_or_sub = 0; // 0: vco
+  this->isSubOsc = false; // 0: vco
   wave = Wave(0);
   waveType = 0;
+  outputWaveType = 0;
 
   lastOutput = 0;
+
+  initBuffer(cvPwm);
 }
 
-void Osc::setWave(float type){
+void Osc::setWave(int type){
+  // if(!isSubOsc){
+  //   printf("Vco, ");
+  // }else{
+  //   printf("Sub, ");
+  // }
+  // printf("input type = %d\n", type);
   waveType = type;
-  type = (type==PURE_SQR ? SQR : type);
-  if(vco_or_sub == 0){
-    wave = Wave(type);
-  }else{
-    if(type == 3){
-      wave = Wave(2);
-    }else{
-      wave = Wave(type);
-    }
-  }
+  outputWaveType = (type==SAW_PWM ? (isSubOsc ? SAW : SQR) : type);
+  wave = Wave(outputWaveType);
+  // printf("type corrected = %d\n", type);
 }
 
 // void Osc::setLocalMaxToOne(){
@@ -82,6 +84,25 @@ double Osc::poly_blep(double t){
   else return 0.0;
 }
 
+// float Osc::getPwmPhaseFromPhase(int){
+//   return this->phase;
+// }
+
+// float Sub::getPwmPhaseFromPhase(int){
+//   return this->phase;
+// }
+
+float Osc::getPwmPhaseFromPhase(int i){
+
+  float pwm= (((float)cvPwm[2*i]/MAX)+1.)/2.;
+
+  // this->
+
+  float coeff = .5 * 100 / 99; // ie .5 / coeff = 99%, 1% Duty Cycle to 99% Duty Cycle
+
+  return trim(this->phase * coeff + TABLE_SIZE * pwm*(1- coeff), TABLE_SIZE);
+}
+
 void Osc::outputWave(void* outputBuffer){
   // printf("osc output\n");
   sample_t* out = (sample_t*) outputBuffer;
@@ -91,7 +112,7 @@ void Osc::outputWave(void* outputBuffer){
   // double maxTri2 = 0;
   // double minTri2 = 0;
 
-  switch(waveType){
+  switch(outputWaveType){
 
     case SAW:
       for(int i=0; i<FRAMES_PER_BUFFER; i++){
@@ -101,12 +122,10 @@ void Osc::outputWave(void* outputBuffer){
         // maxTri = (value>maxTri?value:maxTri);
 
         *out++ += value * this->volume;  // mono/left
-        // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
-        // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
         *out++ += value  * this->volume ;  // right
 
-        computedWave[2*i] = value*volume;
-        computedWave[2*i+1] = value*volume;
+        computedWave[2*i] = value;
+        computedWave[2*i+1] = value;
 
 
         updateFreq(i);
@@ -118,12 +137,12 @@ void Osc::outputWave(void* outputBuffer){
       break;
 
     case SQR:
-    // printf("here");
-      // maxTri = 0;
+      float pwmPhase;
       for(int i=0; i<FRAMES_PER_BUFFER; i++){
-        double value = this->wave.wave[(int)this->phase];
-        value += MAX * poly_blep(this->phase / TABLE_SIZE);
-        value -= MAX * poly_blep(fmod(this->phase / TABLE_SIZE + 0.5, 1.));
+        pwmPhase = this->getPwmPhaseFromPhase(i);
+        double value = this->wave.wave[(int)pwmPhase];
+        value += MAX * poly_blep(pwmPhase / TABLE_SIZE);
+        value -= MAX * poly_blep(fmod(pwmPhase / TABLE_SIZE + 0.5, 1.));
 
         // maxTri = (value>maxTri?value:maxTri);
 
@@ -132,8 +151,8 @@ void Osc::outputWave(void* outputBuffer){
         // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
         *out++ += value  * this->volume ;  // right
 
-        computedWave[2*i] = value*volume;
-        computedWave[2*i+1] = value*volume;
+        computedWave[2*i] = value;
+        computedWave[2*i+1] = value;
 
         updateFreq(i);
         this->phase += (this->phaseIncrement);
@@ -156,22 +175,15 @@ void Osc::outputWave(void* outputBuffer){
 
         // Leaky integrator: y[n] = A * x[n] + (1 - A) * y[n-1]
         value =  ( dPhaseIncrement * value + (1 - dPhaseIncrement) * lastOutput);
-        // maxTri2 = (value>maxTri2?value:maxTri2);
-        // minTri2 = (value<minTri2?value:minTri2);
         
         lastOutput = value;
         value = value * 5;
 
-        // maxTri = (value>maxTri?value:maxTri);
-        // minTri = (value<minTri?value:minTri);
-
         *out++ += value * this->volume;  // mono/left
-        // *out++ += poly_blep(this->phase / TABLE_SIZE) * MAX;
-        // *out++ += MAX * poly_blep((this->phase / TABLE_SIZE))  ;  // right
-        *out++ += value  * this->volume ;  // right
+        *out++ += value * this->volume ;  // right
 
-        computedWave[2*i] = value*volume;
-        computedWave[2*i+1] = value*volume;
+        computedWave[2*i] = value;
+        computedWave[2*i+1] = value;
 
         updateFreq(i);
         this->phase += (this->phaseIncrement);
@@ -194,8 +206,8 @@ void Osc::outputWave(void* outputBuffer){
         *out++ += this->wave.wave[(int)this->phase] * this->volume;  // mono/left
         *out++ += this->wave.wave[(int)this->phase] * this->volume;  // right
 
-        computedWave[2*i] = this->wave.wave[(int)this->phase]*volume;
-        computedWave[2*i+1] = this->wave.wave[(int)this->phase]*volume;
+        computedWave[2*i] = this->wave.wave[(int)this->phase];
+        computedWave[2*i+1] = this->wave.wave[(int)this->phase];
 
         updateFreq(i);
         this->phase += (this->phaseIncrement);
@@ -217,7 +229,7 @@ void Osc::outputWave(void* outputBuffer){
 // seq value -> range -> add to knob freq and freq CV -> quantize
 Vco::Vco() :
 Osc(){
-  vco_or_sub = 0;
+  isSubOsc = false;
   range = 1;
   seq = new AudioObject();
 
@@ -263,6 +275,9 @@ int Vco::getWave(){
 
 float Vco::getFreq(){
   return freq;
+}
+int Vco::getDiv(int i){
+  return (int) (((double)cvDiv[2*i] )/ MAX * 8);
 }
 
 void Vco::updateFreq(){
@@ -330,13 +345,19 @@ void Vco::output(void* outputBuffer){
     seq->output((void*) sequence);
 
   initBuffer(cvFreq);
+  initBuffer(cvDiv);
+  initBuffer(cvPwm);
   if(CVinputs[vcoIn_vco]!=nullptr)
     CVinputs[vcoIn_vco]->output((void*) cvFreq);
+  if(CVinputs[vcoIn_sub]!=nullptr)
+    CVinputs[vcoIn_sub]->output((void*) cvDiv);
+  if(waveType == SAW_PWM &&  CVinputs[vcoIn_pwm]!=nullptr){
+    CVinputs[vcoIn_pwm]->output((void*) cvPwm);}
 
   updateFreq();
 
   
-  // freq CV input is gathered in updateFreq
+  // freq CV input is applied in updateFreq(int)
 
   // update Phase Increment
 
@@ -349,21 +370,20 @@ void Vco::output(void* outputBuffer){
   // apply volume
   this->outputWave(outputBuffer);
 
-  
-
 }
 
 void Vco::CVOutput(void* outputBuffer){
   sample_t * out = (sample_t*) outputBuffer;
   for(int i=0; i<FRAMES_PER_BUFFER; i++){
-    *out++ += computedWave[2*i];  // mono/left
-    *out++ += computedWave[2*i+1];  // right
+    *out++ += computedWave[2*i]*volume;  // mono/left
+    *out++ += computedWave[2*i+1]*volume;  // right
   }
 }
 Sub::Sub() :
 Vco(){
-  vco_or_sub = 1;
+  isSubOsc = true;
   vco = nullptr;
+  setNumberOfCVInputs(0);
 }
 
 void Sub::setVco(Vco* vco){
@@ -388,7 +408,6 @@ void Sub::computeDiv(){
     seq->output((void*) sequence);
 
   // create an array with the div values
-
   div = trim(knobDiv, 1, knobDiv);
 }
 
@@ -399,7 +418,8 @@ void Sub::updateFreq(int i){
 
   if(vco != nullptr){
     this->vco->computeFreq(i);
-    freq = this->vco->getFreq() /( (int) trim((this->div + ((double) sequence[2*i])/127. * (-8)), 1, 16));
+    freq = this->vco->getFreq() /
+      ( (int) trim(this->div + ((double) sequence[2*i])/127. * (-8) + this->vco->getDiv(i), 1, 16));
   }
 
   // setFreq(knobFreq);
@@ -409,7 +429,7 @@ void Sub::updateFreq(int i){
 void Sub::output(void* outputBuffer){
   // set wave from parent vco
   if(vco != nullptr)
-  updateWaveType(vco->getWave());
+    updateWaveType(vco->getWave());
 
   // check values from state
   checkValues();
@@ -430,4 +450,12 @@ void Sub::output(void* outputBuffer){
   // output
   // apply volume
   this->outputWave(outputBuffer);
+}
+
+void Sub::altOutput(void* outputBuffer){
+  sample_t * out = (sample_t*) outputBuffer;
+  for(int i=0; i<FRAMES_PER_BUFFER; i++){
+    *out++ += computedWave[2*i];  // mono/left
+    *out++ += computedWave[2*i+1];  // right
+  }
 }

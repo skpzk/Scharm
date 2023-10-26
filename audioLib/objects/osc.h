@@ -21,7 +21,7 @@ class Osc : public AudioObject{
 
 		void setFreq(float);
 		void setNoteMidi(float);
-		void setWave(float);
+		void setWave(int);
 		StateKeys stateKeys;
 		double poly_blep(double t);
 
@@ -32,22 +32,25 @@ class Osc : public AudioObject{
 		// Wavetables sample_t
 		Wave wave;
 		float phaseIncrement;
-		float phase;
+		
 
 		float lastOutput;
 		// sample_t localMax = MAX;
 
 		float freqArray[FRAMES_PER_BUFFER];
+		float getPwmPhaseFromPhase(int);
 		
 
 
 	protected:
-		int vco_or_sub;// 0 is for vco, 1 is for sub
+		bool isSubOsc;
 		float freq;
+		float phase;
 
 		float volume;
 
-		int waveType;
+		int waveType; // selected by the gui, SAW_OR_SQR (3) is sqr with pwm for vco and saw for sub 
+		int outputWaveType; // actual output, there is no SAW_OR_SQR possible for this one
 
 		void updatePhaseIncrement();
 		void outputWave(void*);
@@ -56,12 +59,14 @@ class Osc : public AudioObject{
 
 		sample_t sequence[2*FRAMES_PER_BUFFER];
 		sample_t cvFreq[2*FRAMES_PER_BUFFER];
+		sample_t cvDiv[2*FRAMES_PER_BUFFER];
+		sample_t cvPwm[2*FRAMES_PER_BUFFER];
 
 		sample_t computedWave[2*FRAMES_PER_BUFFER];
 
 };
 
-enum vcoInputs {vcoIn_vco, vcoIn_sub, vcoIn_pwm};
+enum vcoInputs {vcoIn_vco, vcoIn_sub, vcoIn_pwm, vcoIn_pwm_default};
 
 class Vco : public Osc{
 	public:
@@ -71,6 +76,7 @@ class Vco : public Osc{
 		void CVOutput(void*);
 		int getWave();
 		float getFreq();
+		int getDiv(int);
 
 		void setSequencer(AudioObject*);
 
@@ -88,6 +94,7 @@ class Vco : public Osc{
 		
 		void updateFreq();
 		virtual void updateFreq(int );
+		// float getPwmPhaseFromPhase(int);
 
 		
 
@@ -104,10 +111,12 @@ class Sub : public Vco{
 		Sub();
 
 		void output(void*);
+		void altOutput(void*);
 		void setVco(Vco*);
 
 	private:
 		void checkValues();
+		// float getPwmPhaseFromPhase(int);
 
 		float knobDiv;
 		float div;

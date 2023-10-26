@@ -12,7 +12,7 @@ Last thing I was doing :
   + adding sub oscs
     todo: change behaviour of quantize ET to mimic that of quantize JI
   + adding a filter
-  - integrate a moog filter, based on the pdf, see filter.cpp
+  + integrate a moog filter, based on the pdf, see filter.cpp
 
 Interface :
  tbd:
@@ -68,6 +68,10 @@ BUGS :
     maybe I could find a way to synchronize their phases on some special conditions, 
     like check if they have the same freq and then phase sync ?
     this is especially noticeable with a square wave
+
+  - sometimes the gui patch cables stop working, ie. they don't follow the moving mouse
+    this can cause the app to crash (Segmentation fault (core dumped))
+    Steps to reproduce : play with the patch cables for a while.
 */
 
 /*

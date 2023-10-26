@@ -52,12 +52,24 @@ void PpIn::output(void* outbuffer){
 }
 
 void PpIn::connect(PpOut* ppOut){
+  if(hasDefaultConnection && ppOut != defaultPpOut){
+    ppOutVector.pop(defaultPpOut->name); // does not throw an error if not in the vector
+  }
   ppOutVector.push_back(ppOut);
 }
 
 void PpIn::disconnect(PpOut* ppOut){
   while(blockDisconnect){}
   ppOutVector.pop(ppOut->name);
+  if(hasDefaultConnection && ppOutVector.size() == 0){
+    connect(defaultPpOut);
+  }
+}
+
+void PpIn::setDefaultConnection(PpOut* ppOut){
+  hasDefaultConnection = true;
+  defaultPpOut = ppOut;
+  connect(ppOut);
 }
 
 
@@ -68,8 +80,10 @@ Patchbay::Patchbay(){
   outs[ppo_vco2] = {"vco2",  new AudioObject(), &AudioObject::output};
 
   outs[ppo_vco1sub1] = {"vco1sub1",  new AudioObject(), &AudioObject::output};
+  outs[ppo_vco1sub1_normalled] = {"vco1sub1_normalled",  new AudioObject(), &AudioObject::output};
   outs[ppo_vco1sub2] = {"vco1sub2",  new AudioObject(), &AudioObject::output};
   outs[ppo_vco2sub1] = {"vco2sub1",  new AudioObject(), &AudioObject::output};
+  outs[ppo_vco2sub1_normalled] = {"vco2sub1_normalled",  new AudioObject(), &AudioObject::output};
   outs[ppo_vco2sub2] = {"vco2sub2",  new AudioObject(), &AudioObject::output};
 
   outs[ppo_vca] = {"vca",  new AudioObject(), &AudioObject::output};
@@ -106,6 +120,7 @@ Patchbay::Patchbay(){
   ins[16] = PpIn("seq1");
   ins[17] = PpIn("seq2");
 
+  ins[18] = PpIn("oscillo");
 
 }
 
@@ -199,4 +214,21 @@ void Patchbay::disconnect(std::string inPpName, std::string outPpName){
 
   ppIn->disconnect(ppOut);
 
+}
+
+void Patchbay::setDefaultConnection(std::string inPpName, std::string outPpName){
+  PpOut * ppOut = nullptr;
+  
+  PpIn * ppIn = getInput(inPpName);
+
+  for(int i=0; i<PPOUTLENGTH; i++){
+    if(outs[i].name == outPpName){
+      ppOut = &(outs[i]);
+    }
+  }
+
+  if(ppIn ==nullptr || ppOut == nullptr)
+    return;
+
+  ppIn->setDefaultConnection(ppOut);
 }

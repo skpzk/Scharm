@@ -6,9 +6,8 @@ Clock::Clock(){
 
   stateKeys.freq = "tempo";
 
-  wave = Wave(4, 1);// wave type : square, maxValue : 1
+  wave = Wave(SQR, 1);// wave type : square, maxValue : 1
 
-  // setWave(PURE_SQR);
 }
 
 void Clock::setFreq(float freq){

@@ -163,6 +163,7 @@ void setColorFromStyle(QColor * color, string style, string colorSelector){
         vector<string> lineSplitted = split(line, ":");
         if(lineSplitted[0] == colorSelector && lineSplitted.size() > 0){
             *color = QColor(QString::fromStdString(lineSplitted[1]));
+            // cout << colorSelector << " : " <<   lineSplitted[1] << endl;
             return;
         }
         // cout << lineSplitted[0] <<endl;
@@ -173,7 +174,8 @@ void Button::getColorFromStyleSheet(){
     string style = "";
 
     pointColor = QColor("black");
-    bgColor = QColor("white");
+    // bgColor = QColor("white");
+    bgColor = QColor("red");
 
     if(isHoldable() && isHeld()){
         style = getStyleFromPseudoState("Held");
@@ -215,6 +217,7 @@ void Button::getColorFromStyleSheet(){
 void Button::paintEvent(QPaintEvent*){
     QPainter p(this);
     p.setBrush(QColor("black"));
+    // p.setPen(QPen(QColor("red")));
 
     p.setBackgroundMode(Qt::OpaqueMode);
     p.setRenderHint(QPainter::Antialiasing);
@@ -236,9 +239,11 @@ void Button::paintEvent(QPaintEvent*){
     
 
     p.setBrush(QBrush(bgColor));
+    p.setPen(QPen(pointColor));
 
     float w = this->width();
     float h = this->height();
+    // p.setPen(QPen(QColor("red")));
     p.drawRect(0, 0, this->width(), this->height());
 
     // draw text

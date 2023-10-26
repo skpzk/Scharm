@@ -11,6 +11,7 @@
 #include <csignal>
 #include <iostream>
 #include "sections/patchbay.h"
+#include "sections/oscillo.h"
 
 
 using namespace::std;
@@ -22,6 +23,7 @@ class Window : public QMainWindow
         explicit Window(QWidget *parent = 0);
 
         GuiPatchbay *patchbay;
+        OscilloSection *oscillo;
     private:
         QWidget *createMainSection();
         QWidget *createTopControls();

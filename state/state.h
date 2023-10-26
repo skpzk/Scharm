@@ -196,28 +196,38 @@ struct CallbackFunction
 	std::function<void(void*, float)> callback;
 };
 
+struct CallbackFunctionVector
+{
+	void* p;
+	std::function<void(void*, std::vector<float>)> callback;
+};
+
 
 class Param{
 	public:
 		Param(std::string, float);
 		Param(std::string);
 		void setValue(float);
+		void setValue(std::vector<float>);
 		float getValue();
 
 		std::string getName();
 
 		operator float() const;
 		void attachCallback(void*, std::function<void(void*, float)>);
+		void attachCallback(void*, std::function<void(void*, std::vector<float>)>);
 		
 		// friend class StateDict;
 
 		void call(float);
+		void call(std::vector<float>);
 			
 	private:
 		std::string name;
 		float value;
 		
 		std::vector<CallbackFunction> callbacks;
+		std::vector<CallbackFunctionVector> callbacksV;
 };
 
 

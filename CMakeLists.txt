@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5.0)
 project(scharm VERSION 0.1.0)
 
 set(CMAKE_AUTOMOC ON)
@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # debug plotting with python
+find_package(Python COMPONENTS Interpreter Development)
 find_package(pybind11 REQUIRED)
 
 set(SOURCES
@@ -35,6 +36,7 @@ set(SOURCES
     gui/sections/rhythm.cpp
     gui/sections/vcos.cpp
     gui/sections/patchbay.cpp
+    gui/sections/oscillo.cpp
 
     gui/widgets/sectionLabel.cpp
     gui/widgets/knob.cpp
@@ -61,6 +63,7 @@ set(SOURCES
     audioLib/objects/sequencer.cpp
     audioLib/objects/env.cpp
     audioLib/objects/patchbay.cpp
+    audioLib/objects/noise.cpp
 
     audioLib/utils/SignalUtils.cpp
     audioLib/utils/midi.cpp
@@ -73,11 +76,11 @@ add_executable(scharm main.cpp ${SOURCES})
 find_package(Threads REQUIRED)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 
-find_package(pybind11 REQUIRED)
+# find_package(pybind11 REQUIRED)
 
 # debug plotting with python
 target_include_directories(scharm PUBLIC 
-    "/usr/lib/python3.10/site-packages/numpy/core/include"
+    "/usr/lib/python3.11/site-packages/numpy/core/include"
     )
 
 if (UNIX)
@@ -92,7 +95,7 @@ if (UNIX)
         m
         dl
 
-        python3.10
+        python3.11
         fftw3 # fft lib
         pybind11::embed
         pybind11::module

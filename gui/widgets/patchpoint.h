@@ -21,7 +21,8 @@ we should have used a drag and drop implementation, see : https://doc.qt.io/qt-5
 
 */
 
-using namespace::std;
+
+// using namespace::std;
 
 class Patchpoint : public QWidget
 {
