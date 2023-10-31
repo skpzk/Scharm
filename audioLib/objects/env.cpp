@@ -43,6 +43,7 @@ void Env::checkValues(){
 
   // std::cout << "a          = "<<a          << "\nd         = "<<d <<std::endl;
   // std::cout << "tau attack = "<<tau_attack << "\ntau decay = "<<tau_decay <<std::endl;
+  // int test = State::params("eg")->getValue();
 
   egSetting = (EgSetting) State::params("eg")->getValue();
 }
@@ -79,7 +80,7 @@ void Env::updateClockSignal(){
 
   // clockSignal gets the clock signals from the rhythms
   // it is updated to contain the envelope
-  // it may backfire one day, but for now it saves us a buffer.
+  // it may backfire one day, but for now it saves us one buffer.
 
   initBuffer(clockSignal);
 

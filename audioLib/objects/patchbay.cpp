@@ -120,7 +120,8 @@ Patchbay::Patchbay(){
   ins[16] = PpIn("seq1");
   ins[17] = PpIn("seq2");
 
-  ins[18] = PpIn("oscillo");
+  ins[18] = PpIn("oscillo1");
+  ins[19] = PpIn("oscillo2");
 
 }
 

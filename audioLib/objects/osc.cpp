@@ -303,13 +303,19 @@ void Vco::computeFreq(int i){
   // this->freq = trim(mtof(((double)sequence[2*i])/127. * range * 12 + ftom(this->freq)), 22000);
   // printf("ftom(freq) = %f, ftom(knobFreq) = %f\n", ftom(freq), ftom(knobFreq));
 
-  this->freq = trim(mtof(((double)sequence[2*i])/127. * range * 12 + (((double)cvFreq[2*i] )/ MAX *12*5) + ftom(quantizedFreq)), 22000);
+  this->freq = trim(
+    mtof(
+      ((double)sequence[2*i])/127. * range * 12 + 
+      (((double)cvFreq[2*i] )/ MAX *12*5) + 
+      ftom(quantizedFreq)
+    ), 22000
+  );
 
   // printf("cv midi = %f\n", (((double)cvFreq[2*i] )/ MAX *12*5));
   // printf("freq = %f\n", freq);
 
   // quantize freq
-  // quantizeFloat(&this->freq, quantValue);
+  quantizeFloat(&this->freq, quantValue);
 }
 
 void Vco::updateFreq(int i){

@@ -3,8 +3,8 @@
 /*
 Last thing I was doing :
   audioLib: 
-  - creating vcos
-  - figuring out how to implement CVInputs
+  + creating vcos
+  + figuring out how to implement CVInputs
   + testing load : works with 500 oscs
   + write an extensive doc for params
   + correcting range for osc : can it have a quarter tone scale by default (no quantize)
@@ -13,28 +13,30 @@ Last thing I was doing :
     todo: change behaviour of quantize ET to mimic that of quantize JI
   + adding a filter
   + integrate a moog filter, based on the pdf, see filter.cpp
+  + patchbay set filter eg output
+  + patchbay/filter : set up cutoff input
 
 Interface :
  tbd:
   holdbutton
   
   patchcords:
-  - add communication with state
+  + add communication with state
 
   communication with state
-  - warnstate and check state are implemented for knobs
+  + warnstate and check state are implemented for knobs
 
   proper dark mode : 
   + knob text color isn't right
 
   radios:
-  - add mouse press event
-  - bug : when max sizing, mouse press hitbox is moved to the left
+  + add mouse press event
+  + bug : when max sizing, mouse press hitbox is moved to the left
 
   knobs :
   - change statekeys of "stepX"
-  - bug: knob doesn't follow mouse correctly
-  - bug: when clicking on the title, it sets the value, but it should only focus on the knob
+  + bug: knob doesn't follow mouse correctly
+  + bug: when clicking on the title, it sets the value, but it should only focus on the knob
   - when clicking on the value, add an option to set the number via text
   - when pressing shift and moving the knob, switch to float values
   - when pressing ctrl, round to ints
@@ -42,12 +44,16 @@ Interface :
   waveslider:
   + add mousepressevent
 
+  + I should be able to leave the app by pressing q everywhere, this doesn't work currently
+    > seems to work now, QComboBox was not sending events to parents
+  + oscillo : should check state at startup and not connect to cva by default
+
 
 State :
  tbd: 
-  patchbay
-  radios
-  wavesliders
+  + patchbay
+  + radios
+  + wavesliders
 
 */
 

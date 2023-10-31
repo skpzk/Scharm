@@ -93,7 +93,14 @@ void Button::warnState(int _){
     // cout << "key = " << stateKey << ", value = " << (float) isChecked()*(!isHeld()) + 2*isHeld() << endl;
 
     State::params(stateKey)->setValue((float) isChecked()*(!isHeld()) + 2*isHeld());
+    // (!isHeld()) + 2*isHeld() returns 1 if it is NOT held, and 2 if it is
+    //  so checked and held returns 2
+    //     checked and not held     1  
+    // not checked and held         0
+    // not checked and not held     0
+
     // repaint();
+
     // held = isChecked();
     // emit notifyHeld(held);
 }
@@ -115,7 +122,14 @@ void Button::checkState(){
     // cout << "checking state :\n";
     // cout << "key = " << stateKey << ", value = " << (float) *State::params(stateKey) << endl;
     // State::params(stateKey)->setValue(value() / maximum());
-    setChecked(*State::params(stateKey));
+    int checked = *State::params(stateKey);
+    if(checked == 0 || checked == 1){
+        setChecked(*State::params(stateKey));
+    }else if(holdable && checked == 2){
+        setChecked(true);
+        held = true;
+        warnState(0);
+    }
 }
 
 // QColor Button::getBackgroundColor(){

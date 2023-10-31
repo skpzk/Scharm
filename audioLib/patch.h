@@ -6,7 +6,7 @@
 
 #include <vector>
 
-enum patchInputs {oscillo};
+enum patchInputs {oscillo1, oscillo2};
 
 class Patch: public AudioObject{
   public:

@@ -105,14 +105,20 @@ void Clock::CVOutput(void* buffer){
 
   for(int i=0; i<FRAMES_PER_BUFFER; i++){
 
-    *out++ += clockSignal[2*i];  // mono/left
-    *out++ += clockSignal[2*i+1];
+    *out++ += clockSignal[2*i] * MAX;  // mono/left
+    *out++ += clockSignal[2*i+1] * MAX;
   }
 
 }
 
 void Clock::output(void* buffer){
-  CVOutput(buffer);
+  sample_t* out = (sample_t*) buffer;
+
+  for(int i=0; i<FRAMES_PER_BUFFER; i++){
+
+    *out++ += clockSignal[2*i];  // mono/left
+    *out++ += clockSignal[2*i+1];
+  }
 }
 
 RhythmGenerator::RhythmGenerator(){

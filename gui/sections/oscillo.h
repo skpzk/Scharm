@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QBoxLayout>
+#include <QComboBox>
 
 // class CustomView : public QGraphicsView{
 //     Q_OBJECT
@@ -26,6 +27,9 @@ private:
     float arHeight; // aspect ratio height
 };
 
+class CustomComboBox;
+
+
 class OscilloSection : public QWidget{
     
     Q_OBJECT
@@ -35,21 +39,31 @@ class OscilloSection : public QWidget{
         // QWidget *box;
         // QVBoxLayout *vbox;
 
-        static void receiveSignal(void * os, std::vector<float> signal);
+        void receiveSignal(std::vector<float> signal, int);
 
         void checkState();
         void resizeEvent(QResizeEvent *event);
         void paintEvent(QPaintEvent *event);
+
+        std::vector<std::string> currentInputs;
     private:
         QGraphicsScene *scene;
         // CustomView *view;
         QGraphicsView *view;
 
         void plotAxes();
-        std::vector<float> signal;
-        void plotSignal();
+        std::vector<std::vector<float>> signalsVector;
+        
+        void plotSignals();
 
-        std::string currentInput;
+        
+
+        // QComboBox * cbox;
+        std::vector<CustomComboBox *> cboxes;
+        // CustomComboBox * cbox2;
+        QStringList sources;
+        std::vector<std::string> stateKeys;
+        // std::vector<std::string> colors;
         
 
 
@@ -65,6 +79,23 @@ class OscilloSection : public QWidget{
         void repaintDisplay();
         
 
+};
+
+
+class CustomComboBox : public QComboBox{
+    Q_OBJECT
+    public:
+        CustomComboBox(QWidget *widget);
+        std::string stateKey;
+        static void receiveSignal(void * os, std::vector<float> signal);
+        int index;
+        OscilloSection* os;
+        QColor color;
+    private:
+        // send events to parent to be able to quit by pressing 'q'
+        virtual void keyPressEvent(QKeyEvent* e); 
+    public slots:
+        void signalSelection(QString);
 };
 
 

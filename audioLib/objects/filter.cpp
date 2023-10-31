@@ -252,7 +252,14 @@ void MFilter::filter(void* outputBuffer){
     // s3 = a1 * x31 - b1 * y31;
     // s4 = a1 * x41 - b1 * y41;
 
-    computeCoefsInLoop(trim(mtof(ftom(fc) + egAmount * 64 * ((double)env[2*i])/MAX), 21000));
+    computeCoefsInLoop(
+      trim(
+        mtof(
+          ftom(fc) + ((float)cutoff[2*i]/MAX) * 5 * 12 
+          + egAmount * 64 * ((double)env[2*i])/MAX
+        ), 21000
+      )
+    );
 
     s1 = a0 * x11 + g * y11;
     s2 = a0 * x21 + g * y21;
@@ -295,7 +302,7 @@ void MFilter::output(void* out){
 
 
 Vcf::Vcf(){
-
+  setNumberOfCVInputs(1);
 }
 
 void Vcf::checkValues(){
@@ -336,17 +343,20 @@ void Vcf::output(void* buf){
   // get env
   // compute fc based on values and env
   // filter
+  
   switch (fType)
   {
-  case moog:
-    mFilter.filter(buf);
-    break;
-
   case biquad:
+    initBuffer(bqFilter.cutoff);
+    if(CVinputs[vcfCutoff]!=nullptr)
+      CVinputs[vcfCutoff]->output((void*) bqFilter.cutoff);
     bqFilter.filter(buf);
     break;
-  
+  case moog:
   default:
+    initBuffer(mFilter.cutoff);
+    if(CVinputs[vcfCutoff]!=nullptr)
+      CVinputs[vcfCutoff]->output((void*) mFilter.cutoff);
     mFilter.filter(buf);
     break;
   }

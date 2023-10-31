@@ -160,6 +160,7 @@ Param::Param(string name_){
 }
 
 void Param::setValue(float value_){
+    string tmp = this->name;
     value = value_;
     call(value);
 }

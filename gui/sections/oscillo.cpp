@@ -8,8 +8,8 @@
 
 #include <QGraphicsLineItem>
 #include <QResizeEvent>
-#include <QComboBox>
 
+// #include <functional>
 #include <stdio.h>
 #include <math.h>
 #include <iostream>
@@ -23,6 +23,16 @@ using namespace::std;
 // 	return name;
 // }
 
+CustomComboBox::CustomComboBox(QWidget *parent):QComboBox(parent){
+
+}
+
+void CustomComboBox::keyPressEvent(QKeyEvent* e){
+    e->ignore(); 
+    // send event to parent to be able to quit by pressing 'q'
+    this->parentWidget()->eventFilter(this, (QEvent*) e);
+}
+
 OscilloSection::OscilloSection(QWidget *parent):
 QWidget(parent)
 {
@@ -35,7 +45,7 @@ QWidget(parent)
     //check state
     // checkState();
 
-    scene = new QGraphicsScene;
+    scene = new QGraphicsScene(this);
     scene->setSceneRect(-100, -80, 200, 160);
 
     scene->setBackgroundBrush(Qt::black);
@@ -50,7 +60,7 @@ QWidget(parent)
     // QGraphicsItem *item = scene->itemAt(0, 0, QTransform());
 
     // view = new CustomView(scene);
-    view = new QGraphicsView();
+    view = new QGraphicsView(this);
     view->setContentsMargins(0, 0, 0, 0);
     view->setScene(scene);
     view->fitInView(scene->sceneRect());
@@ -69,26 +79,48 @@ QWidget(parent)
 
     
 
-    QGridLayout *grid = new QGridLayout;
+    // QGridLayout *grid = new QGridLayout;
 
     section->vbox->addWidget(arwidget);
-    QLabel *label = new QLabel("TEST");
-    QComboBox * cbox = new QComboBox();
+    // QLabel *label = new QLabel("TEST");
+    // cbox = new QComboBox(this);
 
-    QStringList sources = {"VCA", "VCO 1", "VCO 1 SUB 1", "VCO 1 SUB 2",
+    QStringList sources_tmp = {"VCA", "VCO 1", "VCO 1 SUB 1", "VCO 1 SUB 2",
                     "VCA EG", "VCO 2", "VCO 2 SUB 1", "VCO 2 SUB 2",
                     "VCF EG",
                     "SEQ 1", "SEQ 1 CLK", "SEQ 2", "SEQ 2 CLK", "NOISE",
                     "CLOCK", "SH", "MIDI CLK", "MIDI"};
+    sources = sources_tmp;
 
-    cbox->addItems(sources);
-    section->vbox->addWidget(cbox);
+    stateKeys.push_back("oscillo1");
+    stateKeys.push_back("oscillo2");
 
-    currentInput = "vco1";
+    for(int i=0;i<stateKeys.size();i++){
+        CustomComboBox * cbox = new CustomComboBox(this);
+        cbox->stateKey = stateKeys.at(i); 
+        cbox->index = i;
+        cbox->addItems(sources);
+        cbox->os = this;
+        section->vbox->addWidget(cbox);
+        currentInputs.push_back("");
+        State::params(stateKeys.at(i))
+            ->attachCallback((void*) cbox, 
+            &CustomComboBox::receiveSignal);
+        connect(cbox, &QComboBox::currentTextChanged, cbox, &CustomComboBox::signalSelection);
+        cboxes.push_back(cbox);
 
-    State::connections.connect("oscillo", "vco1");
-    State::params("oscillo")->attachCallback((void*) this, OscilloSection::receiveSignal);
+        signalsVector.push_back(vector<float> {0});
+    }
+    cboxes.at(0)->color = QColor("#f8c60d");
+    cboxes.at(0)->setStyleSheet("background-color: #111111; color: #f8c60d; selection-background-color: #37373d;");
+    cboxes.at(1)->color = QColor("#1e3aa1");
+    cboxes.at(1)->setStyleSheet("background-color: #111111; color: #1e3aa1; selection-background-color: #37373d;");
+
+
+
+    // State::connections.connect("oscillo", "vco1");
     
+    checkState();
 
     // section->vbox->addLayout(grid, 1);
     QSpacerItem * verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -101,8 +133,6 @@ QWidget(parent)
     // section->vbox->setStretch(1, 100);
 
     connect(this, &OscilloSection::repaintDisplay, this, &OscilloSection::repaintSlot);
-    connect(cbox, &QComboBox::currentTextChanged, this, &OscilloSection::signalSelection);
-    
 }
 
 // CustomView::CustomView(QGraphicsScene *scene):
@@ -112,55 +142,111 @@ QWidget(parent)
 // int CustomView::heightForWidth(int w) const{
 //     return 4*w/5;
 // }
-void OscilloSection::receiveSignal(void * _os, vector<float> signal){
 
-    OscilloSection * os = (OscilloSection*) _os;
+void OscilloSection::checkState(){
+    for(int i=0;i<stateKeys.size();i++){
+        string stateKey = stateKeys.at(i);
+        vector<string> inputsList = State::connections.getConnectionsToPpIn(stateKey);
+        if(inputsList.size() > 1){
+            for(string input : inputsList){
+                State::connections.disconnect(stateKey, input);
+            }
+            State::connections.connect(stateKey, inputsList.at(0));
+        }
+        if(inputsList.size() == 0) continue;
+        currentInputs.at(i) = inputsList.at(0);
+        QString input = "";
+        string input_str;
+        for(QString source : sources){
+            input_str = source.toLower().replace(" ", "").toStdString();
+            if(input_str == currentInputs.at(i)){
+                input = source;
+                break;
+            }
+        }
+
+        int index = cboxes.at(i)->findText(input);
+        if ( index != -1 ) { // -1 for not found
+            printf("Index found\n\n");
+            cboxes.at(i)->setCurrentIndex(index);
+            cboxes.at(i)->setCurrentText(input);
+            cboxes.at(i)->update();
+        }else{
+            printf("Index not found\n\n");
+            cout << "currentInput = " << currentInputs.at(0) <<endl;
+            cout << "input = " << input.toStdString() << endl;
+            cout << "cbox[0] = " << cboxes.at(i)->itemData(0).toString().toStdString() << endl << endl;
+        }
+    }
+    // cbox->setCurrentText(QString(currentInput.c_str()));
+}
+
+void CustomComboBox::receiveSignal(void * _cb, vector<float> signal){
+    CustomComboBox * cb = (CustomComboBox*) _cb;
+    cb->os->receiveSignal(signal, cb->index);
+    // cout << "signal received, index = " << cb->index <<endl;
+}
+
+void OscilloSection::receiveSignal(vector<float> signal, int i){
     // printf("signal received\n");
     // for(float s : signal){
     //     cout << s <<endl;
     // }
     // QList<QPointF> *signal;
-    os->signal = signal;
-    emit os->repaintDisplay();
+    signalsVector.at(i) = signal;
+    if(signalsVector.size()-1 == i)
+        emit repaintDisplay();
 }
 
 void OscilloSection::repaintSlot(){
     repaint();
 }
 
-void OscilloSection::signalSelection(QString text){
+void CustomComboBox::signalSelection(QString text){
     printf("text changed to ");
     cout << text.toStdString() <<endl;
-    State::connections.disconnect("oscillo", currentInput);
+    State::connections.disconnect(stateKey, os->currentInputs.at(index));
 
-    currentInput = text.toLower().replace(" ", "").toStdString();
+    os->currentInputs.at(index) = text.toLower().replace(" ", "").toStdString();
 
-    State::connections.connect("oscillo", currentInput);
+    State::connections.connect(stateKey, os->currentInputs.at(index));
+
+}
+void OscilloSection::signalSelection(QString text){
+    // printf("text changed to ");
+    // cout << text.toStdString() <<endl;
+    // State::connections.disconnect("oscillo", currentInput);
+
+    // currentInput = text.toLower().replace(" ", "").toStdString();
+
+    // State::connections.connect("oscillo", currentInput);
 
 }
 
-void OscilloSection::plotSignal(){
-    QPolygonF poly;
+void OscilloSection::plotSignals(){
+    for(int i=0;i<stateKeys.size();i++){
+        QPolygonF poly;
 
-    float y_display_max = 60;
-    float signal_max = 1;
-    float x_width = 200;
+        float y_display_max = 60;
+        float signal_max = 1;
+        float x_width = 200;
 
-    float signal_v_stretch = y_display_max/signal_max;
-    float signal_h_stretch = x_width/signal.size();
-    float xmin = -100;
+        float signal_v_stretch = y_display_max/signal_max;
+        float signal_h_stretch = x_width/signalsVector.at(i).size();
+        float xmin = -100;
 
-    for(int i=0; i < signal.size(); i++){
-        float s = signal.at(i) * (-1) * signal_v_stretch;
-        float posx = xmin + i*signal_h_stretch;
-        poly << QPointF(posx, s);
+        for(int j=0; j < signalsVector.at(i).size(); j++){
+            float s = signalsVector.at(i).at(j) * (-1) * signal_v_stretch;
+            float posx = xmin + j*signal_h_stretch;
+            poly << QPointF(posx, s);
+        }
+        // poly << signal;
+        QPen *pen = new QPen(cboxes.at(i)->color);
+
+        QPainterPath *path = new QPainterPath();
+        path->addPolygon(poly);
+        scene->addPath(*path, *pen);
     }
-    // poly << signal;
-    QPen *pen = new QPen("red");
-
-    QPainterPath *path = new QPainterPath();
-    path->addPolygon(poly);
-    scene->addPath(*path, *pen);
 }
 
 void OscilloSection::plotAxes()
@@ -217,7 +303,7 @@ void OscilloSection::paintEvent(QPaintEvent *ev){
     view->fitInView(scene->sceneRect());
     scene->clear();
     plotAxes();
-    plotSignal();
+    plotSignals();
     scene->update();
 }
 

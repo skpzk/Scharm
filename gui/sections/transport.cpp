@@ -58,6 +58,6 @@ QWidget *createTransportSection(Window* parent){
 	section->vbox->setStretch(1, 2);
 	section->vbox->setStretch(2, 2);
 
-    return section;
-    // return box;
+	return section;
+	// return box;
 }

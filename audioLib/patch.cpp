@@ -16,7 +16,7 @@
 
 Patch::Patch(){
 
-  setNumberOfCVInputs(1);
+  setNumberOfCVInputs(2);
   Mixer *mixer = new Mixer;
 
   Vco *vco1 = new Vco;
@@ -206,6 +206,8 @@ Patch::Patch(){
   patchbay->setOutput("vco2sub1_normalled", vco2sub1, &AudioObject::altOutput);
   patchbay->setOutput("vco2sub2", vco2sub2);
   patchbay->setOutput("vca", vca);
+  patchbay->setOutput("vcfeg", filterEg);
+  patchbay->setOutput("clock", clock);
 
   vco1->setCVInput(vcoIn_vco, patchbay->getInput("vco1"));
   vco1->setCVInput(vcoIn_sub, patchbay->getInput("vco1sub"));
@@ -218,9 +220,12 @@ Patch::Patch(){
   patchbay->setDefaultConnection("vco2pwm", "vco2sub1_normalled");
 
   vca->setCVInput(vcaIn, patchbay->getInput("vca"));
+  vcf->setCVInput(vcfCutoff, patchbay->getInput("cutoff"));
 
-  this->setCVInput(oscillo, patchbay->getInput("oscillo"));
-  this->stateKeys.guiCallback = "oscillo";
+  this->setCVInput(oscillo1, patchbay->getInput("oscillo1"));
+  this->setCVInput(oscillo2, patchbay->getInput("oscillo2"));
+  this->stateKeys.guiCallback = "oscillo1";
+  this->stateKeys.guiCallback2 = "oscillo2";
 
   // patchbay->connect("vco1", "vcaeg");
 
@@ -250,16 +255,31 @@ void Patch::update(){
 
   initBuffer(audio);
 
-  if(CVinputs[oscillo]!=nullptr){
+  if(CVinputs[oscillo1]!=nullptr){
     counter ++;
     if(counter >=10){
-      CVinputs[oscillo]->output((void*) audio);
+      CVinputs[oscillo1]->output((void*) audio);
       std::vector<float> audioVector;
       for(int i=0;i<2*FRAMES_PER_BUFFER;i++){
         audioVector.push_back(((float)audio[i])/((float) (1<<27)));
       }
       State::params(stateKeys.guiCallback)->setValue(audioVector);
-      counter = 0;
+      // counter = 0;
     }
+  }
+  initBuffer(audio);
+  if(CVinputs[oscillo2]!=nullptr){
+    if(counter >=10){
+      CVinputs[oscillo2]->output((void*) audio);
+      std::vector<float> audioVector;
+      for(int i=0;i<2*FRAMES_PER_BUFFER;i++){
+        audioVector.push_back(((float)audio[i])/((float) (1<<27)));
+      }
+      State::params(stateKeys.guiCallback2)->setValue(audioVector);
+      // counter = 0;
+    }
+  }
+  if(counter >=10){
+    counter = 0;
   }
 }

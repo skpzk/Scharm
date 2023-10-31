@@ -2,7 +2,7 @@
 #define OBJECTS_PATCHBAY_H
 
 #define PPOUTLENGTH 18
-#define PPINLENGTH 19
+#define PPINLENGTH 20
 
 class PpIn;
 #include "audioObject.h"

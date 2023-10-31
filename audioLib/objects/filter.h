@@ -12,6 +12,7 @@ typedef struct{
 }BiquadCoefs;
 
 enum FilterType { moog, biquad };
+enum filterInputs {vcfCutoff};
 
 class Vcf;
 
@@ -60,6 +61,7 @@ class BiquadFilter : public AudioObject{
   
   protected:
     void filter(void*);
+    sample_t cutoff[2*FRAMES_PER_BUFFER];
 
   friend Vcf;
 };
@@ -112,6 +114,7 @@ class MFilter : public AudioObject{
     AudioDetector peakLimiter;
 
     sample_t env[2*FRAMES_PER_BUFFER];
+    sample_t cutoff[2*FRAMES_PER_BUFFER];
   
   protected:
     void filter(void*);

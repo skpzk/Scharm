@@ -16,7 +16,9 @@ std::set<std::string> implementedPps = {
 	"VCA EG", "VCA",
 	"VCO 1", "VCO 1 SUB 1", "VCO 1 SUB 2", 
 	"VCO 2", "VCO 2 SUB 1", "VCO 2 SUB 2",
-	"NOISE", "VCO 1 SUB", "VCO 2 SUB", "VCO 1 PWM", "VCO 2 PWM"};
+	"NOISE", "VCO 1 SUB", "VCO 2 SUB", 
+	"VCO 1 PWM", "VCO 2 PWM", "CUTOFF", 
+	"VCF EG", "CLOCK"};
 
 Patchpoint::Patchpoint(QWidget * parent,
     const QString& text, string ioType): 

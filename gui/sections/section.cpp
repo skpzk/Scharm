@@ -14,7 +14,7 @@ QWidget(parent)
 	label->setAlignment(Qt::AlignCenter);
 	widgetConf(label);
 
-	vbox = new QVBoxLayout;
+	vbox = new QVBoxLayout(this);
 	layoutConf(vbox);
 	this->setLayout(vbox);
 	vbox->addWidget(label);
