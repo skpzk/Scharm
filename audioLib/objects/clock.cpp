@@ -123,11 +123,11 @@ void Clock::output(void* buffer){
 
 RhythmGenerator::RhythmGenerator(){
   div=1;
-  accum = 0;
+  accum = -1;
   lastValueIn = 0;
-  lastValueOut = 1;
+  lastValueOut = 0;
   reset=false;
-
+  started = false;
 }
 
 void RhythmGenerator::setInput(AudioObject* masterClk){
@@ -135,16 +135,19 @@ void RhythmGenerator::setInput(AudioObject* masterClk){
 }
 
 void RhythmGenerator::checkValues(){
-  div = (int) *State::params(stateKeys.div);
-  // printf("div = %d\n", div);
-  // setFreq(freq);
+  div = (int) trim(*State::params(stateKeys.div), 1, 16);
+  if(!started){
+    started = true;
+    accum = div -1;
+  }
+
   bool tmpReset = State::params("reset")->getValue();
   if(tmpReset != reset){ // reset only when the button is toggled, not held
     reset = tmpReset;
     if(reset){
-      accum = 0;
+      accum = -1;
       lastValueIn = 0;
-      lastValueOut = 1;
+      lastValueOut = 0;
     }
   }
 }
@@ -161,28 +164,23 @@ void RhythmGenerator::updateClockSignal(){
     value = clockSignal[2*i]; // get pulse
     accum += (lastValueIn != value?1:0); // detect change in pulse
     // each time there is a change, increment accum;
+    // so accum represents the number of changes in the clock signal
 
     lastValueIn = value;
 
+    // if accum == div, then invert the value of lastValeOut (0 becomes 1 and vice-versa)
     lastValueOut = (accum == div?1-lastValueOut:lastValueOut);
 
+    // only output when change occurs
+    // represents the rising edge of the output of the rhythm generator
     risingEdgeSignal[2*i] = (accum == div) * lastValueOut;
     risingEdgeSignal[2*i + 1] = (accum == div) * lastValueOut;
 
+    // accum = mod(accum, div)
     accum = (accum>=div?0:accum);
 
-    // if(accum == div){
-    //   accum = 0;
-    //   lastValueOut = 1-lastValueOut;
-    // }
-    // value = (value + 1.)/2;
-
-    // maxClock = (value > maxClock?value:maxClock);
-    // minClock = (value < minClock?value:minClock);
-
-    clockSignal[2*i] = lastValueOut ;  // mono/left
-    clockSignal[2*i + 1] = lastValueOut ;  
-
+    clockSignal[2*i] = lastValueOut ;
+    clockSignal[2*i + 1] = lastValueOut ;
 
   }
 }

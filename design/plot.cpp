@@ -95,4 +95,53 @@ namespace plt{
     plot(signal);
 
   }
+
+  void plotWithOffset(void* buffer, float offset){
+    sample_t* inbuf = (sample_t*) buffer;
+    std::vector<double> signal;
+
+    // apply offset
+    for(int i=0;i<FRAMES_PER_BUFFER;i++){
+      signal.push_back(inbuf[2*i] + offset);
+    }
+
+    // plot buffer
+    plot(signal);
+  }
+
+  void plotWithOffsetAndStretch(void* buffer, float offset, float stretch){
+    sample_t* inbuf = (sample_t*) buffer;
+    std::vector<double> signal;
+
+    // apply offset
+    for(int i=0;i<FRAMES_PER_BUFFER;i++){
+      signal.push_back(((float)inbuf[2*i] * stretch) + offset);
+    }
+
+    // plot buffer
+    plot(signal);
+  }
+
+  void plotHLineAt(float offset){
+    std::vector<double> signal;
+
+    // apply offset
+    for(int i=0;i<FRAMES_PER_BUFFER;i++){
+      signal.push_back(offset);
+    }
+
+    // plot thin dashed line
+    py::dict locals = py::dict{
+      "signal"_a = signal,
+    };
+
+    // Execute Python code, using the variables saved in `locals`
+    py::exec(R"(
+    
+    import matplotlib.pyplot as plt
+    plt.plot(signal, color='black', lw=.4, linestyle='dashed')
+    
+    )",
+    py::globals(), locals);
+  }
 }

@@ -78,6 +78,16 @@ BUGS :
   - sometimes the gui patch cables stop working, ie. they don't follow the moving mouse
     this can cause the app to crash (Segmentation fault (core dumped))
     Steps to reproduce : play with the patch cables for a while.
+
+  + bug with rhythmic section :
+    steps to reproduce : 
+    - erase the contents of state.scharm
+    - play, tempo to some value
+    - assign one rhythm to a sequencer : it runs backwards, the vca EG is always on, 
+      and the sequence is not applied on the vcos or the subs
+    bug disappears when we move the knob for a rhythm
+    > the div was set to 0 in RhythmGenerator, 
+      fixed by trimming the div value for the RG from state to (1,16)
 */
 
 /*
@@ -128,81 +138,6 @@ int app(int argc, char **argv){
 
 #include <vector>
 
-// typedef struct{
-//   std::string name;
-//   int value;
-// }PpOut;
-
-// class PpOutVector : public std::vector<PpOut>{
-//   public:
-//     void set(std::string n, int v){
-//       for(int i=0;i<this->size();i++){
-//         if((*this)[i].name == n){
-//           (*this)[i].value = v;
-//           return;
-//         }
-//       }
-//     }
-
-//     int pop(std::string n){
-//       auto pos = this->begin();
-//       for(int i=0;i<this->size();i++){
-//         if((*this)[i].name == n){
-//           this->erase(this->begin() + i);
-//           return 0;
-//         }
-//       }
-//       return 1;
-//     }
-// };
-
-// void printPP(vector<double> pps){
-//   for(int i=0;i<pps.size();i++){
-//     cout << "pps["<<i<<"] = " << pps[i]<<endl;
-//   }
-// }
-// void printPP(PpOutVector pps){
-//   cout<<"Print pps: \n";
-//   for(int i=0;i<pps.size();i++){
-//     cout << "pps["<<i<<"] = " << pps[i].name<< ", " << pps[i].value<<endl;
-//   }
-// }
-// void testPp(){
-//   using namespace std;
-
-//   cout << "testing pp\n";
-
-//   // vector<double> test;
-//   // test.push_back(1);
-//   // test.push_back(1);
-//   // test.push_back(1);
-//   // test.push_back(1);
-
-//   // // test.erase(test[2]);
-//   // test[2].
-
-//   PpOut pp1;
-//   pp1.name = "test1";
-//   pp1.value = 0;
-
-//   PpOut pp2 = {"test2", 4};
-//   PpOut pp3 = {"test3", 6};
-
-//   PpOutVector ppv;
-//   ppv.push_back(pp1);
-//   ppv.push_back(pp2);
-//   ppv.push_back(pp3);
-
-//   printPP(ppv);
-
-//   ppv.set("test1", 2);
-//   printPP(ppv);
-
-//   ppv.pop("test2");
-//   printPP(ppv);
-// }
-
-
 #include "state/state.h"
 void testState(){
   State::print();
@@ -234,8 +169,6 @@ void testState(){
 void testReadState(){
   State::read();
   State::print();
-
-
 }
 
 #include "gui/widgets/patchpoint.h"
@@ -258,17 +191,15 @@ void testOverloadingEquality(int argc, char **argv){
   b = new Patchpoint(nullptr, "testa", "in");
   cout << "a==b : " << (*a==*b) << endl;
   
-  // b = new Patchpoint(nullptr, "testa", "in");
-  // cout << "a==b : " << (*a==*b) << endl;
-  
 }
+#include "design/plotter.h"
 
 int main(int argc, char **argv) {
   app(argc, argv);
   // debug_plotter_spectrum();
   // debug_plotter_env();
   // plotEnv();
-
+  // plotClock();
   // testPp();
 
   // testState();

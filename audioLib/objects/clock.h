@@ -33,6 +33,8 @@ class Clock: public AudioObject{
     bool playing;
     
     sample_t clockSignal[2*FRAMES_PER_BUFFER];
+
+    // represents the rising edge of the output of the rhythm generator
     sample_t risingEdgeSignal[2*FRAMES_PER_BUFFER];
 
     Wave wave;
@@ -71,6 +73,7 @@ class RhythmGenerator: public AudioObject{
     void tick();
     void checkValues();
     bool reset;
+    bool started;
 
     sample_t clockSignal[2*FRAMES_PER_BUFFER];
     sample_t risingEdgeSignal[2*FRAMES_PER_BUFFER];

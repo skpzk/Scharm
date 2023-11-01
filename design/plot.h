@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../audioApi/AudioConstants.h"
+
 namespace plt{
   void show();
   void figure();
@@ -12,6 +13,11 @@ namespace plt{
   void plot(void*);
   void plot(void*, void*, int size);
   void plot(void*, void*);
+
+  void plotWithOffset(void*, float);
+  void plotWithOffsetAndStretch(void*, float, float);
+
+  void plotHLineAt(float);
 
   void plot(std::vector<double>);
 }

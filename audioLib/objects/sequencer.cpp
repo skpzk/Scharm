@@ -4,12 +4,14 @@
 #include "../../../state/state.h"
 
 #include <algorithm> // just for min, this may be an overkill, to be tested
+#include <iostream>
 
+using namespace std;
 
 Sequencer::Sequencer(){
 
   lastValue = 0;
-  stepCounter = 1;
+  stepCounter = -1;
 
 }
 
@@ -53,8 +55,10 @@ void Sequencer::checkValues(){
 void Sequencer::updateClockSignal(){
 
   // clockSignal gets the clock signals from the rhythms
-  // the it is updated to contain the step sequence
+  // the buffer is updated to contain the step sequence
   // it may backfire one day, but for now it saves us a buffer.
+  // cout << stateKeys.step1;
+  // printf("active rhythms: %d %d %d %d\n", activeRhythms[0], activeRhythms[1], activeRhythms[2], activeRhythms[3]);
 
   initBuffer(clockSignal);
   initBuffer(stepsSignal);
